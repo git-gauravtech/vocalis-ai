@@ -1,4 +1,6 @@
-const API = "http://localhost:8000";
+const API = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") 
+  ? "http://localhost:8000" 
+  : "";
 
 // ── TOKEN MANAGEMENT ──────────────────────────────────
 function setToken(token) { localStorage.setItem("mm_token", token); }
