@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vocalis — AI Mock Interviews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+:root {
+  --bg: #010103;
+  --surface: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.3);
+  --text: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.6);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── CINEMATIC GRAIN ── */
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: 999;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity: 0.03; pointer-events: none; mix-blend-mode: overlay;
+}
+
+/* ── INTERACTIVE POND ── */
+.pond-container {
+  position: fixed; inset: 0; z-index: -1;
+  background: var(--bg); overflow: hidden;
+  pointer-events: auto;
+}
+.liquid-bg { position: absolute; inset: -100px; filter: blur(80px) contrast(140%); }
+.blob {
+  position: absolute; width: 600px; height: 600px; 
+  background: var(--accent); border-radius: 50%; 
+  opacity: 0.4; animation: liquid-move 20s infinite alternate ease-in-out;
+}
+.blob-1 { top: -10%; left: -10%; background: #4338ca; width: 800px; height: 800px; }
+.blob-2 { bottom: -10%; right: -10%; background: #6d28d9; animation-delay: -5s; }
+.blob-3 { top: 30%; left: 20%; background: #312e81; width: 500px; height: 500px; animation-delay: -10s; }
+@keyframes liquid-move {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(150px, 100px) scale(1.1) rotate(180deg); }
+  100% { transform: translate(-50px, 50px) scale(1) rotate(360deg); }
+}
+
+.water-ring {
+  position: absolute; width: 2px; height: 2px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.1), 0 0 10px rgba(255,255,255,0.05);
+  pointer-events: none; transform: translate(-50%, -50%) scale(1);
+  opacity: 0; animation: ring-expand 3s cubic-bezier(0, 0.4, 0.5, 1) forwards;
+  z-index: 2;
+}
+@keyframes ring-expand {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+  10% { opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(120); opacity: 0; }
+}
+
+.glass-overlay {
+  position: fixed; inset: 0; z-index: -1;
+  background: radial-gradient(circle at 50% 50%, transparent, rgba(1, 1, 3, 0.4));
+  backdrop-filter: blur(2px); pointer-events: none;
+}
+
+/* ── MODERN PILL NAVBAR ── */
+.nav-container {
+  position: fixed; top: 24px; left: 0; width: 100%; z-index: 1000;
+  display: flex; justify-content: center; padding: 0 24px;
+}
+nav {
+  width: 100%; max-width: 1100px;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 32px;
+  transition: all 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+}
+nav.scrolled {
+  max-width: 900px;
+  padding: 8px 24px;
+  background: rgba(1, 1, 3, 0.7);
+  border-color: var(--accent);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #fff; text-decoration: none; letter-spacing: -1px; }
+.nav-logo span { color: var(--accent); }
+
+.nav-links { display: flex; gap: 32px; }
+.nav-links a {
+  text-decoration: none; color: var(--text-dim); font-size: 13px; font-weight: 500;
+  transition: color 0.3s; position: relative;
+  padding: 4px 0;
+}
+.nav-links a:hover { color: #fff; }
+.nav-links a::after {
+  content: ""; position: absolute; bottom: 0; left: 50%; width: 0; height: 1px;
+  background: var(--accent); transition: 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+  transform: translateX(-50%);
+}
+.nav-links a:hover::after { width: 100%; }
+
+.nav-btn {
+  background: #fff; color: #000; padding: 10px 24px; border-radius: 12px;
+  font-family: 'Syne'; font-weight: 700; font-size: 13px; text-decoration: none;
+  transition: 0.3s;
+}
+.nav-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent-glow); }
+
+/* ── HERO & SECTIONS ── */
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px; }
+.hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(48px, 10vw, 110px); font-weight: 800; line-height: 0.9; letter-spacing: -6px; margin-bottom: 32px; }
+.hero h1 span { display: block; background: linear-gradient(to bottom, #fff 70%, rgba(255,255,255,0.2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-p { font-size: 21px; color: var(--text-dim); max-width: 700px; line-height: 1.6; margin-bottom: 56px; font-weight: 300; }
+
+.btn-primary { background: #fff; color: #000; padding: 20px 48px; border-radius: 18px; font-family: 'Syne'; font-weight: 800; text-decoration: none; transition: 0.4s; display: inline-block; font-size: 18px; }
+.btn-primary:hover { transform: translateY(-5px); box-shadow: 0 30px 60px rgba(255,255,255,0.2); }
+
+/* ... (rest of preview and feature styles remain similar) ... */
+.preview-section { padding: 100px 5vw; position: relative; z-index: 1; perspective: 2000px; }
+.preview-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 52px; padding: 4px; backdrop-filter: blur(60px); animation: float-3d 10s infinite ease-in-out; box-shadow: 0 100px 200px -40px rgba(0,0,0,0.9); }
+@keyframes float-3d { 0%, 100% { transform: rotateX(8deg) rotateY(-4deg) translateY(0); } 50% { transform: rotateX(4deg) rotateY(2deg) translateY(-20px); } }
+
+.section { padding: 120px 6vw; text-align: center; }
+.section-title { font-family: 'Syne', sans-serif; font-size: clamp(32px, 5vw, 64px); font-weight: 800; letter-spacing: -3px; margin-bottom: 80px; }
+.feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.feat-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 32px; padding: 48px; text-align: left; transition: all 0.4s; }
+.feat-card:hover { border-color: var(--accent); transform: translateY(-10px); }
+
+.step-row { display: flex; align-items: center; gap: 60px; margin-bottom: 100px; text-align: left; }
+.step-num { font-family: 'Syne', sans-serif; font-size: 100px; font-weight: 800; color: rgba(255,255,255,0.05); flex-shrink: 0; }
+
+.contact-section { max-width: 800px; margin: 0 auto 120px; padding: 0 24px; text-align: center; }
+.contact-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 40px; padding: 60px; backdrop-filter: blur(40px); }
+.input-group { margin-bottom: 20px; text-align: left; }
+.input-group label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 8px; font-weight: 500; }
+.input-group input, .input-group textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: #fff; font-family: inherit; font-size: 15px; transition: 0.3s; }
+.input-group input:focus, .input-group textarea:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.07); }
+
+.reveal { opacity: 0; transform: translateY(40px); transition: 1s cubic-bezier(0.2, 0, 0.2, 1); }
+.reveal.is-visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<div class="pond-container" id="pond">
+  <div class="liquid-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+</div>
+<div class="glass-overlay"></div>
+<div class="hero-grid"></div>
+
+<div class="nav-container">
+  <nav id="navbar">
+    <a href="/" class="nav-logo">Voca<span>lis</span></a>
+    <div class="nav-links">
+      <a href="#features">Platform</a>
+      <a href="#how">How it works</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="/login.html" class="nav-btn">Get Started</a>
+  </nav>
+</div>
+
+<section class="hero">
+  <h1><span>Interview Practice</span><span>That Actually Works</span></h1>
+  <p class="hero-p">Stop stressing over your next big interview. Vocalis lets you practice with an AI that understands your resume and gives you honest feedback on your technical skills, body language, and confidence.</p>
+  <a href="/login.html" class="btn-primary">Start a Practice Session</a>
+</section>
+
+<section class="preview-section reveal">
+  <div class="preview-card">
+    <div class="preview-inner" style="position: relative; background: #050508; border-radius: 48px; min-height: 680px; display: grid; grid-template-columns: 1fr 400px; overflow: hidden;">
+      <div class="p-left" style="padding: 60px; border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="p-ai-avatar" style="width: 130px; height: 130px; border-radius: 50%; background: #0c0c14; border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 44px; margin-bottom: 24px; position: relative;">
+          <div class="p-ai-ring" style="position: absolute; inset: -12px; border: 1px solid var(--accent); border-radius: 50%; animation: ring-p 2s infinite; opacity: 0.4;"></div>
+          🤖
+        </div>
+        <div style="font-size:12px; color:var(--accent); font-weight:700; letter-spacing:3px; margin-bottom:12px;">AI INTELLIGENCE</div>
+        <div class="p-q-bubble" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 32px; text-align: center; font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; min-height: 200px; display: flex; align-items: center; justify-content: center; position: relative;">
+          <span id="typing-text"></span>
+        </div>
+      </div>
+      <div class="p-right" style="background: #08080c; padding: 40px; display: flex; flex-direction: column; gap: 24px;">
+        <div class="p-cam-box" style="flex: 1; background: #000; border-radius: 32px; border: 1px solid var(--accent); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <div class="p-face" style="position: absolute; width: 140px; height: 140px; border: 2px dashed #22c55e; border-radius: 24px; animation: target 2s infinite;"></div>
+          <div style="font-size:110px; opacity:0.1;">👤</div>
+        </div>
+        <div class="p-transcript" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 24px; font-size: 13px; color: #22c55e; font-family: monospace;">> Analyzing knowledge depth...<br>> Eye contact: Optimal<br>> Confidence: High</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="section-title">Built for Real Results</div>
+  <div class="feat-grid">
+    <div class="feat-card reveal">
+      <div style="font-size:32px; margin-bottom:24px;">🎙️</div>
+      <h3>Real-Time Voice</h3>
+      <p>WebSocket architecture for natural conversation. No lag, just fluid dialogue like a real call.</p>
+    </div>
+    <div class="feat-card reveal">
+      <div style="font-size:32px; margin-bottom:24px;">👁️</div>
+      <h3>Body Language</h3>
+      <p>Our AI tracks your eye-contact and posture. Get coached on how you look, not just what you say.</p>
+    </div>
+    <div class="feat-card reveal">
+      <div style="font-size:32px; margin-bottom:24px;">📈</div>
+      <h3>Honest Feedback</h3>
+      <p>Get a detailed breakdown of your strengths and where you need to improve to land the offer.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="section-title">How It Works</div>
+  <div style="max-width:900px; margin:0 auto;">
+    <div class="step-row reveal">
+      <div class="step-num">01</div>
+      <div>
+        <h3 style="font-family:Syne; font-size:32px; margin-bottom:12px;">Sync Your Resume</h3>
+        <p style="color:var(--text-dim); font-size:18px; font-weight:300; line-height:1.6;">Upload your PDF. Our AI learns your stack and experience to build a custom interview track just for you.</p>
+      </div>
+    </div>
+    <div class="step-row reveal">
+      <div class="step-num" style="order:2">02</div>
+      <div style="order:1; text-align:right;">
+        <h3 style="font-family:Syne; font-size:32px; margin-bottom:12px;">Practice Privately</h3>
+        <p style="color:var(--text-dim); font-size:18px; font-weight:300; line-height:1.6;">Go through a full session. The AI adjusts its difficulty based on how well you're doing in real-time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-section reveal" id="contact">
+  <div class="section-title">Get in Touch</div>
+  <div class="contact-card">
+    <div class="input-row" style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div class="input-group">
+        <label>FULL NAME</label>
+        <input type="text" id="contact-name">
+      </div>
+      <div class="input-group">
+        <label>EMAIL ADDRESS</label>
+        <input type="email" id="contact-email">
+      </div>
+    </div>
+    <div class="input-group">
+      <label>MESSAGE</label>
+      <textarea rows="4" id="contact-msg"></textarea>
+    </div>
+    <button class="btn-primary" id="contact-btn" style="width: 100%; margin-top: 20px; font-size: 16px;">Send Message</button>
+    <div id="contact-status" style="margin-top: 20px; font-size: 14px; display: none;"></div>
+  </div>
+</section>
+
+<footer style="padding: 100px 6vw 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 1;">
+  <div class="nav-logo" style="margin-bottom: 40px;">Voca<span>lis</span></div>
+  <div style="font-size:12px; color:var(--text-dim);">© 2025 Vocalis AI. Built for better interviews.</div>
+</footer>
+
+<script>
+  const pond = document.getElementById('pond');
+  const navbar = document.getElementById('navbar');
+  let lastX = 0, lastY = 0;
+
+  window.addEventListener('mousemove', (e) => {
+    const dist = Math.hypot(e.pageX - lastX, e.pageY - lastY);
+    if (dist > 100) { spawnWaveTrain(e.pageX, e.pageY, 0.4); lastX = e.pageX; lastY = e.pageY; }
+  });
+  window.addEventListener('mousedown', (e) => spawnWaveTrain(e.pageX, e.pageY, 1));
+  function spawnWaveTrain(x, y, opacity) {
+    createRing(x, y, 0, opacity);
+    setTimeout(() => createRing(x, y, 300, opacity * 0.7), 200);
+    setTimeout(() => createRing(x, y, 600, opacity * 0.4), 400);
+  }
+  function createRing(x, y, delay, opacity) {
+    const ring = document.createElement('div');
+    ring.className = 'water-ring';
+    ring.style.left = x + 'px'; ring.style.top = y + 'px'; ring.style.opacity = opacity;
+    pond.appendChild(ring); setTimeout(() => ring.remove(), 3000);
+  }
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 40) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+  });
+
+  const questions = [
+    '"Walk me through how you handled state management in your last React project."',
+    '"Describe a time you had to resolve a conflict within a technical team."',
+    '"How would you optimize a slow database query in a production environment?"',
+    '"What is the most challenging architectural decision you have made?"'
+  ];
+  let qIdx = 0;
+  let charIdx = 0;
+  const targetEl = document.getElementById("typing-text");
+  const cursor = document.createElement("span");
+  cursor.className = "cursor";
+  
+  function typeText() {
+    const textContent = questions[qIdx];
+    if (charIdx < textContent.length) {
+      targetEl.textContent = textContent.substring(0, charIdx + 1);
+      targetEl.appendChild(cursor);
+      charIdx++;
+      setTimeout(typeText, 40);
+    } else {
+      setTimeout(() => { 
+        charIdx = 0; 
+        qIdx = (qIdx + 1) % questions.length;
+        targetEl.textContent = ""; 
+        targetEl.appendChild(cursor); 
+        typeText(); 
+      }, 3500);
+    }
+  }
+  window.addEventListener('load', () => { targetEl.appendChild(cursor); typeText(); });
+
+  const obs = new IntersectionObserver((es) => {
+    es.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Contact Logic
+  const contactBtn = document.getElementById('contact-btn');
+  const contactStatus = document.getElementById('contact-status');
+  contactBtn.addEventListener('click', async () => {
+    const name = document.getElementById('contact-name').value;
+    const email = document.getElementById('contact-email').value;
+    const message = document.getElementById('contact-msg').value;
+    if (!name || !email || !message) return alert('Please fill all fields');
+    contactBtn.disabled = true; contactBtn.textContent = 'Sending...';
+    try {
+      const res = await fetch('/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, message }) });
+      if (res.ok) {
+        contactStatus.style.display = 'block'; contactStatus.style.color = '#22c55e'; contactStatus.textContent = '✓ Message sent successfully!';
+        document.getElementById('contact-name').value = ''; document.getElementById('contact-email').value = ''; document.getElementById('contact-msg').value = '';
+      }
+    } catch (err) {} finally { contactBtn.disabled = false; contactBtn.textContent = 'Send Message'; }
+  });
+</script>
+
+</body>
+</html>

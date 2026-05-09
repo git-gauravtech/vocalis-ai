@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — Vocalis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<script src="../js/auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg: #030305;
+  --surface: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --text: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.6);
+}
+
+body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+
+/* ── BACKGROUND MESH ── */
+.bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.mesh-orb {
+  position: absolute; border-radius: 50%; filter: blur(140px);
+  animation: float 25s infinite alternate ease-in-out; opacity: 0.2;
+}
+.orb-1 { width: 60vw; height: 60vw; background: #312e81; top: -10%; left: -10%; }
+.orb-2 { width: 50vw; height: 50vw; background: #1e1b4b; bottom: -10%; right: -10%; }
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(50px, 30px) scale(1.1); }
+}
+
+.nav { background: rgba(3, 3, 5, 0.8); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); padding: 20px 48px; }
+.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; }
+.nav-logo span { color: var(--accent); }
+
+/* Tabs */
+.tabs { display: flex; gap: 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; margin-top: 20px; }
+.tab { 
+  padding: 16px 0; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; 
+  color: var(--text-dim); cursor: pointer; position: relative; transition: 0.3s;
+}
+.tab:hover { color: #fff; }
+.tab.active { color: var(--accent); }
+.tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--accent); }
+
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+.welcome { margin-bottom: 40px; }
+.welcome h1 { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -2px; margin-bottom: 8px; }
+
+.start-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.03));
+  border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 32px;
+  padding: 48px; display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 48px; gap: 30px; position: relative; overflow: hidden;
+}
+.start-card::after { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, var(--accent-glow), transparent); border-radius: 50%; }
+
+.interview-row {
+  display: grid; grid-template-columns: 1fr auto auto auto auto;
+  align-items: center; gap: 20px; padding: 24px 32px;
+  background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
+  border-radius: 20px; margin-bottom: 12px; transition: all 0.3s;
+}
+.interview-row:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--accent); transform: translateX(5px); }
+
+.chart-container { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 32px; padding: 32px; margin-bottom: 32px; height: 350px; }
+
+.reveal { animation: fadeInUp 0.8s ease both; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh">
+  <div class="mesh-orb orb-1"></div>
+  <div class="mesh-orb orb-2"></div>
+</div>
+
+<nav class="nav">
+  <a href="/student/dashboard.html" class="nav-logo">Voca<span>lis</span></a>
+  <div class="nav-user">
+    <img id="nav-avatar" class="nav-avatar" src="" alt="avatar" referrerpolicy="no-referrer" />
+    <span id="nav-name" class="nav-name"></span>
+    <button class="btn btn-outline" onclick="logout()" style="padding:10px 20px; font-size:13px; border-radius:12px;">Logout</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="welcome reveal">
+    <h1>Welcome back, <span id="user-first" class="glow-text"></span></h1>
+    <p>Monitor your progress and refine your interview skills. <span style="color:var(--accent); cursor:pointer; text-decoration:underline;" onclick="switchTab('performance')">View your performance trends &rarr;</span></p>
+  </div>
+
+  <div class="tabs reveal">
+    <div class="tab active" onclick="switchTab('sessions')">SESSIONS</div>
+    <div class="tab" onclick="switchTab('performance')">PERFORMANCE</div>
+  </div>
+
+  <!-- Sessions View -->
+  <div id="sessions-view" class="view-section active">
+    <div class="start-card reveal">
+      <div>
+        <h2>Start New Simulation</h2>
+        <p>Upload your latest resume and choose a target company to begin an AI-powered technical or behavioral interview.</p>
+      </div>
+      <a href="/student/setup.html" class="btn btn-primary" style="padding: 16px 36px; border-radius: 14px; font-weight: 700; font-family: 'Syne';">New Interview</a>
+    </div>
+
+    <div id="stats-grid" class="grid-3 reveal" style="margin-bottom:48px;"></div>
+    <div class="history-title reveal" style="margin-bottom: 24px; font-family: 'Syne'; font-size: 22px; font-weight: 700;">Performance History</div>
+    <div id="history-list" class="reveal"></div>
+  </div>
+
+  <!-- Performance View -->
+  <div id="performance-view" class="view-section">
+    <div class="chart-container reveal">
+      <canvas id="performanceChart"></canvas>
+    </div>
+    <div class="grid-2">
+      <div class="chart-card reveal" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 24px; padding: 24px;">
+        <h3 style="font-family:'Syne'; font-size:18px; margin-bottom:16px;">Top Strengths</h3>
+        <ul id="strengths-list" style="color:var(--text-dim); font-size:14px; line-height:2;"></ul>
+      </div>
+      <div class="chart-card reveal" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 24px; padding: 24px;">
+        <h3 style="font-family:'Syne'; font-size:18px; margin-bottom:16px;">Growth Areas</h3>
+        <ul id="weaknesses-list" style="color:var(--text-dim); font-size:14px; line-height:2;"></ul>
+      </div>
+    </div>
+    <div style="text-align: right; margin-top: 24px;">
+      <a href="/student/performance.html" style="color:var(--accent); font-size:14px; text-decoration:none; font-weight:600;">Full Performance Intelligence &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<script>
+let globalInterviews = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = requireAuth('student');
+  if (!user) return;
+  populateNav(user);
+  document.getElementById('user-first').textContent = user.name.split(' ')[0];
+
+  const res = await apiFetch('/interview/history');
+  const data = await res.json();
+  globalInterviews = data.interviews || [];
+  
+  renderSessions(globalInterviews);
+});
+
+function switchTab(tab) {
+  // Update Tab Styling
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.remove('active');
+    if (t.textContent.toLowerCase() === tab.toLowerCase()) t.classList.add('active');
+  });
+
+  // Update View Visibility
+  document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+  document.getElementById(tab + '-view').classList.add('active');
+  
+  if (tab === 'performance') renderPerformance(globalInterviews);
+}
+
+function renderSessions(interviews) {
+  const completed = interviews.filter(i => i.status === 'completed');
+  const avgScore = completed.length
+    ? (completed.reduce((s, i) => s + (i.feedback?.overall_score || 0), 0) / completed.length).toFixed(1)
+    : '—';
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${interviews.length}</div><div class="stat-label">Sessions</div></div>
+    <div class="stat-card"><div class="stat-value">${completed.length}</div><div class="stat-label">Reports</div></div>
+    <div class="stat-card"><div class="stat-value">${avgScore}</div><div class="stat-label">Avg Rating</div></div>
+  `;
+
+  const list = document.getElementById('history-list');
+  if (!interviews.length) {
+    list.innerHTML = `<div style="text-align:center; padding: 80px; color: var(--text-dim);">No sessions found. Start your first practice above.</div>`;
+    return;
+  }
+
+  list.innerHTML = interviews.map(iv => {
+    const score = iv.feedback?.overall_score;
+    const scoreHtml = score
+      ? `<span style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:${scoreColor(score)}">${score}/10</span>`
+      : `<span style="font-size:12px; color:var(--text-dim); background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:100px;">${iv.status.toUpperCase()}</span>`;
+    
+    return `
+      <div class="interview-row">
+        <div>
+          <div class="role-company">${iv.role} ${iv.company !== 'General' ? '@ ' + iv.company : ''}</div>
+          <div class="meta">${formatDate(iv.created_at)} · ${iv.interview_type.toUpperCase()}</div>
+        </div>
+        ${scoreHtml}
+        ${iv.status === 'completed'
+          ? `<a href="/student/feedback.html?id=${iv._id}" class="btn btn-outline" style="padding:10px 20px; font-size:13px; border-radius:12px;">Analysis</a>`
+          : `<a href="/student/interview.html?id=${iv._id}" class="btn btn-primary" style="padding:10px 20px; font-size:13px; border-radius:12px;">Resume</a>`
+        }
+      </div>`;
+  }).join('');
+}
+
+function renderPerformance(interviews) {
+  const completed = interviews.filter(i => i.status === 'completed').reverse(); // Chronological
+  if (!completed.length) return;
+
+  const labels = completed.map(i => formatDate(i.created_at).split(',')[0]);
+  const scores = completed.map(i => i.feedback.overall_score);
+
+  const ctx = document.getElementById('performanceChart').getContext('2d');
+  
+  if (window.perfChart) window.perfChart.destroy();
+  
+  window.perfChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Overall Rating',
+        data: scores,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#6366f1',
+        pointRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, max: 10, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.5)' } },
+        x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.5)' } }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // Extract common strengths/weaknesses
+  const strengths = [];
+  const weaknesses = [];
+  completed.forEach(i => {
+    if (i.feedback.strengths) strengths.push(...i.feedback.strengths);
+    if (i.feedback.weaknesses) weaknesses.push(...i.feedback.weaknesses);
+  });
+
+  const uniqueStrengths = [...new Set(strengths)].slice(0, 5);
+  const uniqueWeaknesses = [...new Set(weaknesses)].slice(0, 5);
+
+  document.getElementById('strengths-list').innerHTML = uniqueStrengths.map(s => `<li>✓ ${s}</li>`).join('');
+  document.getElementById('weaknesses-list').innerHTML = uniqueWeaknesses.map(w => `<li>⚠ ${w}</li>`).join('');
+}
+</script>
+</body>
+</html>

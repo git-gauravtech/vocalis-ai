@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Intelligence — Vocalis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css" />
+<script src="../js/auth.js"></script>
+<style>
+:root {
+  --bg: #030305;
+  --surface: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --text: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.6);
+}
+
+body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+
+/* ── BACKGROUND MESH ── */
+.bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.mesh-orb {
+  position: absolute; border-radius: 50%; filter: blur(140px);
+  animation: float 25s infinite alternate ease-in-out; opacity: 0.2;
+}
+.orb-1 { width: 60vw; height: 60vw; background: #312e81; top: -10%; left: -10%; }
+.orb-2 { width: 50vw; height: 50vw; background: #1e1b4b; bottom: -10%; right: -10%; }
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(50px, 30px) scale(1.1); }
+}
+
+.nav { background: rgba(3, 3, 5, 0.8); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); padding: 20px 48px; }
+.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; }
+.nav-logo span { color: var(--accent); }
+
+.admin-header { margin-bottom: 40px; }
+.admin-header h1 { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -2px; margin-bottom: 8px; }
+.admin-header p { color: var(--text-dim); font-size: 16px; font-weight: 300; }
+
+/* Tabs */
+.tabs { display: flex; gap: 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+.tab { 
+  padding: 16px 0; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; 
+  color: var(--text-dim); cursor: pointer; position: relative; transition: 0.3s;
+}
+.tab:hover { color: #fff; }
+.tab.active { color: var(--accent); }
+.tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--accent); }
+
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 48px; }
+.chart-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 32px; padding: 32px; backdrop-filter: blur(40px); }
+.chart-card h3 { font-family: 'Syne', sans-serif; font-size: 18px; margin-bottom: 24px; color: #fff; font-weight: 700; }
+
+.bar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.bar-label { font-size: 13px; color: var(--text-dim); width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 300; }
+.bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 10px; background: var(--accent); transition: width 1s cubic-bezier(0.2, 0, 0.2, 1); }
+.bar-count { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: #fff; width: 30px; text-align: right; }
+
+.msg-card {
+  background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
+  border-radius: 24px; padding: 24px; margin-bottom: 16px;
+}
+.msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.msg-name { font-family: 'Syne', sans-serif; font-weight: 700; color: #fff; }
+.msg-email { font-size: 12px; color: var(--accent); }
+.msg-date { font-size: 12px; color: var(--text-dim); }
+.msg-body { font-size: 14px; color: var(--text-dim); line-height: 1.6; font-weight: 300; }
+
+.reveal { animation: fadeInUp 0.8s ease both; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh">
+  <div class="mesh-orb orb-1"></div>
+  <div class="mesh-orb orb-2"></div>
+</div>
+
+<nav class="nav">
+  <a href="/admin/dashboard.html" class="nav-logo">Voca<span>lis</span> <span style="color:var(--text-dim); font-size:12px; font-family:'Outfit'; font-weight:400; margin-left:8px;">Intelligence</span></a>
+  <div class="nav-user">
+    <img id="nav-avatar" class="nav-avatar" src="" alt="avatar" referrerpolicy="no-referrer" />
+    <span id="nav-name" class="nav-name"></span>
+    <a href="/admin/students.html" class="btn btn-outline" style="padding:10px 20px; font-size:13px; border-radius:12px;">Students</a>
+    <button class="btn btn-outline" onclick="logout()" style="padding:10px 20px; font-size:13px; border-radius:12px;">Logout</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="admin-header reveal">
+    <h1>Admin Console</h1>
+    <p>Managing the Vocalis neural network and student inquiries.</p>
+  </div>
+
+  <div class="tabs reveal">
+    <div class="tab active" onclick="switchTab('analytics')">ANALYTICS</div>
+    <div class="tab" onclick="switchTab('messages')">MESSAGES</div>
+  </div>
+
+  <!-- Analytics View -->
+  <div id="analytics-view" class="view-section active">
+    <div id="stats-grid" class="grid-4 reveal" style="margin-bottom:48px;"></div>
+    <div class="charts-row reveal" id="charts-row"></div>
+    <div style="font-family: 'Syne'; font-size: 22px; font-weight: 700; margin-bottom: 24px;" class="reveal">Recent Sessions</div>
+    <div id="recent-table" class="reveal"></div>
+  </div>
+
+  <!-- Messages View -->
+  <div id="messages-view" class="view-section">
+    <div id="messages-list" class="reveal"></div>
+  </div>
+</div>
+
+<script>
+let analyticsData = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = requireAuth('admin');
+  if (!user) return;
+  populateNav(user);
+  fetchAnalytics();
+});
+
+async function fetchAnalytics() {
+  const res = await apiFetch('/admin/analytics');
+  analyticsData = await res.json();
+  renderAnalytics(analyticsData);
+}
+
+async function fetchMessages() {
+  const res = await apiFetch('/admin/contacts');
+  const data = await res.json();
+  renderMessages(data.contacts || []);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+  
+  event.target.classList.add('active');
+  document.getElementById(tab + '-view').classList.add('active');
+  
+  if (tab === 'messages') fetchMessages();
+}
+
+function renderAnalytics(d) {
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${d.total_students}</div><div class="stat-label">Total Users</div></div>
+    <div class="stat-card"><div class="stat-value">${d.total_interviews}</div><div class="stat-label">Total Sessions</div></div>
+    <div class="stat-card"><div class="stat-value">${d.completed_interviews}</div><div class="stat-label">Completed</div></div>
+    <div class="stat-card"><div class="stat-value">${d.avg_score || '—'}</div><div class="stat-label">Avg Quality</div></div>`;
+
+  const maxCompany = Math.max(...(d.top_companies.map(c => c.count)), 1);
+  const maxRole = Math.max(...(d.top_roles.map(r => r.count)), 1);
+  const typeDist = d.type_distribution || {};
+
+  document.getElementById('charts-row').innerHTML = `
+    <div class="chart-card">
+      <h3>Target Companies</h3>
+      ${d.top_companies.map(c => `
+        <div class="bar-row">
+          <div class="bar-label" title="${c.company}">${c.company || 'General'}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(c.count/maxCompany)*100}%"></div></div>
+          <div class="bar-count">${c.count}</div>
+        </div>`).join('')}
+    </div>
+    <div class="chart-card">
+      <h3>Target Roles</h3>
+      ${d.top_roles.map(r => `
+        <div class="bar-row">
+          <div class="bar-label" title="${r.role}">${r.role || 'General'}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(r.count/maxRole)*100}%; background:#10b981;"></div></div>
+          <div class="bar-count">${r.count}</div>
+        </div>`).join('')}
+    </div>`;
+
+  const recent = d.recent_interviews || [];
+  document.getElementById('recent-table').innerHTML = recent.length ? `
+    <table class="table">
+      <thead><tr><th>Student</th><th>Entity</th><th>Role</th><th>Status</th><th>Rating</th><th>Verdict</th></tr></thead>
+      <tbody>${recent.map(iv => `
+        <tr>
+          <td style="font-size:12px; color:var(--text-dim)">${iv.student_id?.slice(-8)}</td>
+          <td>${iv.company || '—'}</td>
+          <td>${iv.role || '—'}</td>
+          <td><span class="badge badge-purple">${iv.interview_type}</span></td>
+          <td>${iv.feedback?.overall_score ? `<span style="color:${scoreColor(iv.feedback.overall_score)}; font-weight:700;">${iv.feedback.overall_score}/10</span>` : '—'}</td>
+          <td>${iv.feedback?.verdict ? `<span class="badge ${verdictBadge(iv.feedback.verdict)}">${iv.feedback.verdict}</span>` : '—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div style="color:var(--text-dim); text-align:center; padding:40px;">No session activity.</div>';
+}
+
+function renderMessages(msgs) {
+  const list = document.getElementById('messages-list');
+  if (!msgs.length) {
+    list.innerHTML = '<div style="text-align:center; padding:80px; color:var(--text-dim);">No messages yet.</div>';
+    return;
+  }
+  list.innerHTML = msgs.map(m => `
+    <div class="msg-card">
+      <div class="msg-header">
+        <div>
+          <div class="msg-name">${m.name}</div>
+          <div class="msg-email">${m.email}</div>
+        </div>
+        <div class="msg-date">${formatDate(m.created_at)}</div>
+      </div>
+      <div class="msg-body">${m.message}</div>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>

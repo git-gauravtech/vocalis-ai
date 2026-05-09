@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Feedback Report — Vocalis</title>
+<link rel="stylesheet" href="../css/style.css" />
+<script src="../js/auth.js"></script>
+<style>
+.feedback-header {
+  background: linear-gradient(135deg, rgba(108,99,255,0.1), transparent);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 36px; margin-bottom: 32px; display: flex; gap: 32px; align-items: center;
+  flex-wrap: wrap;
+}
+.score-circle {
+  width: 130px; height: 130px; border-radius: 50%; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border: 5px solid; position: relative;
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+  animation: score-pulse 2s infinite alternate ease-in-out;
+}
+@keyframes score-pulse { from { transform: scale(1); box-shadow: 0 0 20px rgba(99,102,241,0.1); } to { transform: scale(1.03); box-shadow: 0 0 40px rgba(99,102,241,0.3); } }
+.score-circle .num { font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; line-height: 1; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+.score-circle .denom { font-size: 14px; color: var(--text3); }
+.header-info { flex: 1; }
+.header-info h1 { font-size: 28px; margin-bottom: 8px; }
+.header-meta { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
+.header-summary { color: var(--text2); font-size: 15px; line-height: 1.6; max-width: 600px; }
+
+.heatmap-wrap { margin-top: 16px; }
+.heatmap-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.heatmap-grid { display: flex; gap: 3px; flex-wrap: wrap; }
+.heat-box { width: 10px; height: 10px; border-radius: 2px; }
+.heat-1 { background: var(--green); opacity: 0.8; }
+.heat-0 { background: var(--red); opacity: 0.4; }
+
+
+.section-heading {
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700;
+  margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+
+.sw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+.sw-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px;
+}
+.sw-card h3 { font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.sw-item {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text2);
+}
+.sw-item:last-child { border-bottom: none; }
+.sw-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.skill-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; text-align: center;
+}
+.skill-name { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+.skill-score { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; }
+.skill-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.skill-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+
+.qa-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+.qa-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.qa-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px; cursor: pointer; gap: 12px;
+}
+.qa-header:hover { background: var(--bg3); }
+.qa-q { font-size: 15px; font-weight: 500; flex: 1; }
+.qa-score-pill {
+  padding: 4px 12px; border-radius: 100px; font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.qa-body { padding: 0 20px 20px; border-top: 1px solid var(--border); display: none; }
+.qa-body.open { display: block; }
+.qa-answer { background: var(--bg3); border-radius: var(--radius); padding: 14px; font-size: 14px; color: var(--text2); margin: 14px 0; }
+.qa-feedback-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.qa-fb-box { border-radius: var(--radius); padding: 14px; font-size: 13px; }
+.qa-fb-good { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+.qa-fb-miss { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+.qa-fb-hint { background: rgba(108,99,255,0.08); border: 1px solid rgba(108,99,255,0.2); font-size: 13px; padding: 14px; border-radius: var(--radius); }
+.qa-fb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; font-weight: 600; }
+
+.tips-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+.tip-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; display: flex; gap: 16px;
+}
+.tip-num {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--accent-glow);
+  border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--accent2); flex-shrink: 0;
+}
+.tip-area { font-weight: 600; margin-bottom: 4px; font-size: 15px; }
+.tip-text { color: var(--text2); font-size: 14px; margin-bottom: 6px; }
+.tip-res { font-size: 13px; color: var(--accent2); }
+
+.readiness-bar-wrap { margin-bottom: 40px; }
+.readiness-label { display: flex; justify-content: space-between; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/student/dashboard.html" class="nav-logo">Voca<span>lis</span></a>
+  <div class="nav-user">
+    <img id="nav-avatar" class="nav-avatar" src="" alt="avatar" />
+    <span id="nav-name" class="nav-name"></span>
+    <a href="/student/setup.html" class="btn btn-primary" style="padding:8px 16px;font-size:13px;">New Interview</a>
+  </div>
+</nav>
+
+<div class="page-md" id="main-content">
+  <div style="display:flex;align-items:center;justify-content:center;height:60vh;">
+    <div class="spinner" style="width:40px;height:40px;border-width:3px;"></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = requireAuth('student');
+  if (!user) return;
+  populateNav(user);
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { window.location.href = '/student/dashboard.html'; return; }
+
+  try {
+    const res = await apiFetch(`/interview/${id}`);
+    const iv = await res.json();
+    renderFeedback(iv, user);
+  } catch {
+    showToast('Could not load feedback', 'error');
+  }
+});
+
+function renderFeedback(iv, user) {
+  const f = iv.feedback;
+  if (!f) {
+    document.getElementById('main-content').innerHTML = `
+      <div style="text-align:center;padding:80px 24px;">
+        <div style="font-size:48px;margin-bottom:16px;">⏳</div>
+        <h2>Feedback not ready yet</h2>
+        <p style="color:var(--text2);margin:12px 0 24px;">The interview may still be in progress.</p>
+        <a href="/student/dashboard.html" class="btn btn-outline">Back to Dashboard</a>
+      </div>`;
+    return;
+  }
+
+  const sc = f.overall_score;
+  const circleColor = scoreColor(sc);
+  const typeEmoji = { technical: '💻', hr: '🤝', both: '🔁' }[iv.interview_type] || '🔁';
+
+  const skillsHtml = Object.entries(f.skill_scores || {}).filter(([,v]) => v !== null && v !== undefined).map(([k, v]) => `
+    <div class="skill-card">
+      <div class="skill-name">${k.replace(/_/g, ' ')}</div>
+      <div class="skill-score" style="color:${scoreColor(v)}">${v}</div>
+      <div class="skill-bar"><div class="skill-bar-fill" style="width:${v*10}%;background:${scoreColor(v)}"></div></div>
+    </div>`).join('');
+
+  const qaHtml = (f.per_question || []).filter(q => q && q.question).map((q, i) => `
+    <div class="qa-item">
+      <div class="qa-header" onclick="toggleQA(this)">
+        <span style="color:var(--text3);font-size:13px;flex-shrink:0">Q${i+1}</span>
+        <span class="qa-q">${q.question}</span>
+        <span class="qa-score-pill" style="background:${scoreColor(q.score)}22;color:${scoreColor(q.score)}">${q.score}/10</span>
+        <span style="color:var(--text3)">▼</span>
+      </div>
+      <div class="qa-body">
+        <div class="qa-answer">"${q.answer}"</div>
+        <div class="qa-feedback-row">
+          <div class="qa-fb-box qa-fb-good"><div class="qa-fb-label" style="color:var(--green)">✓ What was good</div>${q.what_was_good}</div>
+          <div class="qa-fb-box qa-fb-miss"><div class="qa-fb-label" style="color:var(--red)">✗ What was missing</div>${q.what_was_missing}</div>
+        </div>
+        <div class="qa-fb-hint"><div class="qa-fb-label" style="color:var(--accent2)">💡 Ideal Answer Hint</div>${q.ideal_answer_hint}</div>
+      </div>
+    </div>`).join('');
+
+  const tipsHtml = (f.improvement_tips || []).map((t, i) => `
+    <div class="tip-item">
+      <div class="tip-num">${i+1}</div>
+      <div>
+        <div class="tip-area">${t.area}</div>
+        <div class="tip-text">${t.tip}</div>
+        <div class="tip-res">📚 ${t.resources}</div>
+      </div>
+    </div>`).join('');
+
+  const readinessMap = { 'Not Ready': 10, 'Needs Work': 30, 'Almost Ready': 60, 'Ready': 80, 'Exceptional': 100 };
+  const readinessVal = readinessMap[f.interview_readiness] || 50;
+  const readinessColor = readinessVal >= 80 ? 'var(--green)' : readinessVal >= 50 ? 'var(--yellow)' : 'var(--red)';
+
+  document.getElementById('main-content').innerHTML = `
+    <div style="margin-bottom:12px"><a href="/student/dashboard.html" style="color:var(--text3);font-size:14px;text-decoration:none;">← Back to Dashboard</a></div>
+
+    <div class="feedback-header">
+      <div class="score-circle" style="border-color:${circleColor}">
+        <div class="num" style="color:${circleColor}">${sc}</div>
+        <div class="denom">out of 10</div>
+      </div>
+      <div class="header-info">
+        <h1>Interview Feedback Report</h1>
+        <div class="header-meta">
+          <span class="badge badge-purple">${typeEmoji} ${iv.interview_type.toUpperCase()}</span>
+          <span class="badge badge-purple">🏢 ${iv.company}</span>
+          <span class="badge badge-purple">👤 ${iv.role}</span>
+          ${iv.focus_score !== undefined ? `<span class="badge ${iv.focus_score >= 80 ? 'badge-green' : 'badge-yellow'}">👁️ Presence: ${iv.focus_score}%</span>` : ''}
+          ${iv.eye_contact_score !== undefined ? `<span class="badge ${iv.eye_contact_score >= 80 ? 'badge-green' : 'badge-yellow'}">🎯 Eye Contact: ${iv.eye_contact_score}%</span>` : ''}
+          ${iv.multiple_faces ? `<span class="badge badge-red">🛡️ PROCTORING ALERT: Multi-Face Detected</span>` : `<span class="badge badge-green">🛡️ PROCTORING: Verified</span>`}
+          <span class="badge ${verdictBadge(f.verdict)}">${f.verdict}</span>
+        </div>
+        <div class="header-summary">${f.summary}</div>
+        ${f.behavioral_feedback ? `<div class="header-summary" style="margin-top:12px;font-style:italic;color:var(--accent2);border-left:2px solid var(--accent);padding-left:12px;"><strong>Behavioral Insight:</strong> ${f.behavioral_feedback}</div>` : ''}
+        
+        ${iv.focus_timeline && iv.focus_timeline.length ? `
+          <div class="heatmap-wrap">
+            <div class="heatmap-label">Focus Timeline (Heatmap)</div>
+            <div class="heatmap-grid">
+              ${iv.focus_timeline.map(v => `<div class="heat-box heat-${v}" title="${v === 1 ? 'Focused' : 'Lost Focus'}"></div>`).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+      </div>
+    </div>
+
+    <div class="readiness-bar-wrap">
+      <div class="readiness-label">
+        <span style="font-family:'Syne',sans-serif;font-weight:600;">Interview Readiness</span>
+        <span style="color:${readinessColor};font-weight:700;">${f.interview_readiness}</span>
+      </div>
+      <div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:${readinessVal}%;background:${readinessColor}"></div></div>
+    </div>
+
+    <div class="sw-grid">
+      <div class="sw-card">
+        <h3 style="color:var(--green)">✅ Strengths</h3>
+        ${(f.strengths || []).map(s => `<div class="sw-item"><div class="sw-dot" style="background:var(--green)"></div>${s}</div>`).join('')}
+      </div>
+      <div class="sw-card">
+        <h3 style="color:var(--red)">⚠️ Areas to Improve</h3>
+        ${(f.weaknesses || []).map(w => `<div class="sw-item"><div class="sw-dot" style="background:var(--red)"></div>${w}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="section-heading">Skill Scores</div>
+    <div class="skills-grid">${skillsHtml}</div>
+
+    <div class="section-heading">Question-by-Question Analysis</div>
+    <div class="qa-list">${qaHtml}</div>
+
+    <div class="section-heading">Improvement Tips</div>
+    <div class="tips-list">${tipsHtml}</div>
+
+    <div style="text-align:center;padding:20px 0 40px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="/student/setup.html" class="btn btn-primary btn-lg">Practice Again</a>
+      <a href="/student/dashboard.html" class="btn btn-outline btn-lg">Dashboard</a>
+    </div>`;
+}
+
+function toggleQA(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+  header.querySelector('span:last-child').textContent = body.classList.contains('open') ? '▲' : '▼';
+}
+</script>
+</body>
+</html>

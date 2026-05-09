@@ -1,0 +1,23 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Media and Recordings
+*.webm
+*.mp4
+*.mp3
+
+# IDEs and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

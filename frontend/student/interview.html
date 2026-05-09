@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interview — Vocalis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <script src="../js/auth.js"></script>
+  <!-- MediaPipe Face Detection (Fast, CORS-friendly, and Modern) -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #08080f;
+      --panel: #0e0e18;
+      --surface: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.07);
+      --accent: #6c63ff;
+      --accent2: #9d97ff;
+      --red: #ef4444;
+      --green: #22c55e;
+      --text: #f0f0f8;
+      --text2: rgba(255, 255, 255, 0.5);
+      --text3: rgba(255, 255, 255, 0.25);
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+    }
+
+    /* ══ TOPBAR ══════════════════════════════════════════ */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: rgba(8, 8, 15, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .topbar-mid {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .chip.timer-chip {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent2);
+      letter-spacing: 0.05em;
+      border-color: rgba(108, 99, 255, 0.3);
+      background: rgba(108, 99, 255, 0.08);
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .chip.q-chip {
+      color: var(--text2);
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.2;
+      }
+    }
+
+    .end-btn {
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.08);
+      color: #ff6b6b;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.03em;
+    }
+
+    .end-btn:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    /* ══ LAYOUT ══════════════════════════════════════════ */
+    .layout {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: 1fr 8px 300px;
+      grid-template-rows: 1fr 8px 160px;
+    }
+
+    /* ══ DRAG DIVIDERS ═══════════════════════════════════ */
+    .divider-col {
+      grid-column: 2;
+      grid-row: 1/-1;
+      background: var(--border);
+      cursor: col-resize;
+      position: relative;
+      z-index: 50;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .divider-col:hover,
+    .divider-col.dragging {
+      background: var(--accent);
+      width: 8px;
+    }
+
+    .divider-col::after {
+      content: '⋮';
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 14px;
+      letter-spacing: -2px;
+      pointer-events: none;
+    }
+
+    .divider-col:hover::after,
+    .divider-col.dragging::after {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .divider-row {
+      grid-column: 1;
+      grid-row: 2;
+      background: var(--border);
+      cursor: row-resize;
+      position: relative;
+      z-index: 50;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .divider-row:hover,
+    .divider-row.dragging {
+      background: var(--accent);
+    }
+
+    .divider-row::after {
+      content: '···';
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 10px;
+      letter-spacing: 2px;
+      pointer-events: none;
+    }
+
+    .divider-row:hover::after,
+    .divider-row.dragging::after {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Drag cursor on body while dragging */
+    body.dragging-col {
+      cursor: col-resize !important;
+      user-select: none !important;
+    }
+
+    body.dragging-row {
+      cursor: row-resize !important;
+      user-select: none !important;
+    }
+
+    /* Resize hint tooltip */
+    .resize-hint {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(108, 99, 255, 0.15);
+      border: 1px solid rgba(108, 99, 255, 0.3);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 11px;
+      color: var(--accent2);
+      letter-spacing: 0.05em;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 200;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .resize-hint.show {
+      opacity: 1;
+    }
+
+    /* ══ AI PANEL (top-left) ═════════════════════════════ */
+    .ai-panel {
+      grid-column: 1;
+      grid-row: 1;
+      min-width: 200px;
+      min-height: 100px;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 32px;
+    }
+
+    /* Ambient glow */
+    .ai-panel::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108, 99, 255, 0.08) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      pointer-events: none;
+    }
+
+    /* AI Avatar */
+    .ai-avatar-container {
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .ai-rings {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 1px solid rgba(108, 99, 255, 0.15);
+      animation: ringExpand 3s ease-in-out infinite;
+    }
+
+    .ai-rings:nth-child(2) {
+      inset: -36px;
+      animation-delay: 1s;
+      border-color: rgba(108, 99, 255, 0.08);
+    }
+
+    .ai-rings:nth-child(3) {
+      inset: -52px;
+      animation-delay: 2s;
+      border-color: rgba(108, 99, 255, 0.04);
+    }
+
+    @keyframes ringExpand {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.05);
+        opacity: 0.5;
+      }
+    }
+
+    .ai-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 2px solid rgba(108, 99, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s;
+      box-shadow: 0 0 0 0 rgba(108, 99, 255, 0);
+    }
+
+    .ai-avatar.speaking {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px rgba(108, 99, 255, 0.4), 0 0 60px rgba(108, 99, 255, 0.15);
+      animation: avatarPulse 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes avatarPulse {
+      from {
+        transform: scale(1);
+      }
+
+      to {
+        transform: scale(1.04);
+      }
+    }
+
+    .ai-face {
+      font-size: 40px;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .ai-name {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 6px;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .ai-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text3);
+      margin-bottom: 32px;
+      min-height: 20px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .status-dot.thinking {
+      background: var(--accent);
+      animation: blink 0.8s ease-in-out infinite;
+    }
+
+    .status-dot.speaking {
+      background: var(--accent2);
+      animation: blink 0.5s ease-in-out infinite;
+    }
+
+    /* Question bubble */
+    .question-bubble {
+      max-width: 580px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px 20px 20px 4px;
+      padding: 24px 28px;
+      position: relative;
+    }
+
+    .question-bubble::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 24px;
+      right: 24px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(108, 99, 255, 0.6), transparent);
+      border-radius: 0 0 2px 2px;
+    }
+
+    .q-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+    }
+
+    .q-text {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text);
+      font-weight: 400;
+      min-height: 52px;
+    }
+
+    .thinking-anim {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      color: var(--text3);
+      font-size: 14px;
+      min-height: 52px;
+    }
+
+    .thinking-anim.show {
+      display: flex;
+    }
+
+    .tdot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: tdotBounce 1.4s ease-in-out infinite;
+    }
+
+    .tdot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .tdot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes tdotBounce {
+
+      0%,
+      80%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.3;
+      }
+
+      40% {
+        transform: translateY(-8px);
+        opacity: 1;
+      }
+    }
+
+    /* Progress bar under question */
+    .q-progress {
+      margin-top: 16px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .q-progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ══ CAMERA PANEL (top-right) ════════════════════════ */
+    .cam-panel {
+      grid-column: 3;
+      grid-row: 1;
+      background: #050508;
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 10px;
+      position: relative;
+      min-width: 160px;
+    }
+
+    .cam-tile {
+      flex: 1;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0d0d18;
+      position: relative;
+      border: 1.5px solid rgba(255, 255, 255, 0.06);
+      min-height: 0;
+    }
+
+    .cam-tile video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      display: block;
+    }
+
+    .cam-overlay-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+      padding: 20px 12px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cam-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .cam-name-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .cam-top-controls {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .cam-pill-btn {
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cam-pill-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .rec-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      background: rgba(239, 68, 68, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: 7px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .rec-badge.show {
+      display: flex;
+    }
+
+    .rec-badge-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #fff;
+      animation: blink 0.9s infinite;
+    }
+
+    .cam-off-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text3);
+      font-size: 12px;
+    }
+
+    .cam-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    /* Mic level visualizer */
+    .mic-visualizer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      height: 32px;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .mic-bar {
+      width: 3px;
+      border-radius: 2px;
+      background: var(--accent);
+      transition: height 0.1s ease;
+      min-height: 3px;
+      max-height: 24px;
+      height: 3px;
+    }
+
+    /* ══ TRANSCRIPT PANEL (bottom-left) ══════════════════ */
+    .transcript-panel {
+      grid-column: 1;
+      grid-row: 3;
+      border-top: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      background: rgba(8, 8, 15, 0.9);
+      display: flex;
+      flex-direction: column;
+      padding: 14px 20px;
+      gap: 10px;
+      min-height: 60px;
+      overflow: hidden;
+    }
+
+    .transcript-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      font-family: 'Syne', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .transcript-box {
+      flex: 1;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text2);
+      border-radius: 10px;
+      padding: 2px 0;
+    }
+
+    .transcript-box.has-text {
+      color: var(--text);
+    }
+
+    .transcript-placeholder {
+      color: var(--text3);
+      font-style: italic;
+      font-size: 13px;
+    }
+
+    /* ══ CONTROLS PANEL (bottom-right) ═══════════════════ */
+    .controls-panel {
+      grid-column: 3;
+      grid-row: 3;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      background: rgba(8, 8, 15, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 12px;
+      min-height: 60px;
+    }
+
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Round control buttons */
+    .ctrl-round {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .ctrl-round .ctrl-tip {
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: var(--text3);
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .btn-mic {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .btn-mic:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-mic.active {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+      animation: micGlow 1.5s ease-out infinite;
+    }
+
+    @keyframes micGlow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+      }
+
+      100% {
+        box-shadow: 0 0 0 16px rgba(239, 68, 68, 0);
+      }
+    }
+
+    .btn-cam {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .btn-cam:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-cam.off {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text3);
+    }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #8b85ff);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      letter-spacing: 0.03em;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(108, 99, 255, 0.45);
+    }
+
+    .btn-submit:disabled {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text3);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ══ MODALS ══════════════════════════════════════════ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: #12121e;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 36px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-icon {
+      font-size: 44px;
+      margin-bottom: 14px;
+    }
+
+    .modal h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .modal p {
+      color: var(--text2);
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .mbtn {
+      padding: 10px 22px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .mbtn-ghost {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+    }
+
+    .mbtn-ghost:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .mbtn-red {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .mbtn-red:hover {
+      background: #dc2626;
+    }
+
+    .analyzing-spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin: 0 auto 4px;
+      border: 3px solid rgba(108, 99, 255, 0.2);
+      border-top-color: var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Countdown before interview */
+    .countdown-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(8, 8, 15, 0.95);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .countdown-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 120px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      animation: countPop 1s ease-in-out;
+    }
+
+    @keyframes countPop {
+      0% {
+        transform: scale(1.4);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .countdown-label {
+      font-size: 16px;
+      color: var(--text2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Notification toast */
+    .notif {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a28;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 13px;
+      color: var(--text2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      animation: notifIn 0.3s ease;
+      z-index: 150;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @keyframes notifIn {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ COUNTDOWN ══════════════════════════════════════ -->
+  <div class="countdown-overlay" id="countdown">
+    <div class="countdown-num" id="countdown-num">3</div>
+    <div class="countdown-label">Interview starting...</div>
+  </div>
+
+  <!-- ── START OVERLAY ── -->
+  <div id="start-overlay" class="modal-overlay show" style="backdrop-filter:blur(30px); z-index: 1000;">
+    <div class="card reveal" style="max-width:400px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:20px;">🎤</div>
+      <h2 style="margin-bottom:12px;">Ready to Begin?</h2>
+      <p style="color:var(--text2);margin-bottom:24px;font-size:14px;">The AI is ready to conduct your interview. Ensure
+        your microphone is enabled and you are in a quiet place.</p>
+      <button class="btn btn-primary btn-lg" style="width:100%" onclick="beginSession()">Start Interview</button>
+    </div>
+  </div>
+
+  <!-- ══ TOPBAR ═════════════════════════════════════════ -->
+  <div class="topbar">
+    <div class="logo">Voca<span>lis</span></div>
+    <div class="topbar-mid">
+      <div class="chip">
+        <div class="live-dot"></div> LIVE
+      </div>
+      <div class="chip q-chip" id="q-chip">Question 1</div>
+      <div class="chip timer-chip" id="timer">00:00</div>
+    </div>
+    <button class="end-btn" onclick="showEndModal()">End Interview</button>
+  </div>
+
+  <!-- ══ LAYOUT ═════════════════════════════════════════ -->
+  <div class="layout" id="layout">
+
+    <!-- COLUMN DIVIDER (drag left-right) -->
+    <div class="divider-col" id="divider-col" title="Drag to resize"></div>
+
+    <!-- ROW DIVIDER (drag up-down) -->
+    <div class="divider-row" id="divider-row" title="Drag to resize"></div>
+
+    <!-- AI PANEL -->
+    <div class="ai-panel">
+      <div class="ai-avatar-container">
+        <div class="ai-rings"></div>
+        <div class="ai-rings"></div>
+        <div class="ai-rings"></div>
+        <div class="ai-avatar" id="ai-avatar">
+          <div class="ai-face">🤖</div>
+        </div>
+      </div>
+      <div class="ai-name">AI Interviewer</div>
+      <div class="ai-status" id="ai-status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Ready</span>
+      </div>
+
+      <div class="question-bubble">
+        <div class="q-label">Current Question</div>
+        <div class="thinking-anim" id="thinking">
+          <div class="tdot"></div>
+          <div class="tdot"></div>
+          <div class="tdot"></div>
+          <span style="margin-left:6px;font-size:13px;">Thinking of next question...</span>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div class="q-progress">
+          <div class="q-progress-fill" id="q-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMERA PANEL -->
+    <div class="cam-panel">
+      <div class="cam-tile" id="cam-tile">
+        <video id="cam-video" autoplay muted playsinline></video>
+        <!-- Canvas overlay for face detection boxes -->
+        <canvas id="face-canvas"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;transform:scaleX(-1);"></canvas>
+        <div class="cam-off-placeholder" id="cam-off" style="display:none">
+          <div class="cam-avatar">👤</div>
+          <span>Camera off</span>
+        </div>
+        <div class="rec-badge" id="rec-badge">
+          <div class="rec-badge-dot"></div> REC
+        </div>
+        <!-- Face detection status badge -->
+        <div id="face-status" style="
+        position:absolute;bottom:38px;right:8px;
+        display:flex;align-items:center;gap:5px;
+        background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);
+        border-radius:8px;padding:4px 10px;
+        font-size:11px;font-weight:600;color:#fff;
+        border:1px solid rgba(255,255,255,0.1);
+        transition:all 0.3s;
+      ">
+          <div id="face-dot"
+            style="width:6px;height:6px;border-radius:50%;background:#ef4444;transition:background 0.3s;"></div>
+          <span id="face-label">No Face</span>
+        </div>
+        <div class="cam-top-controls">
+          <button class="cam-pill-btn" onclick="toggleCamera()" id="cam-pill">📷</button>
+        </div>
+        <div class="cam-overlay-bottom">
+          <div class="cam-name">
+            <div class="cam-name-dot"></div>
+            <span id="cam-name-text">You</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mic visualizer -->
+      <div class="mic-visualizer" id="mic-viz">
+        <div class="mic-bar" id="b1"></div>
+        <div class="mic-bar" id="b2"></div>
+        <div class="mic-bar" id="b3"></div>
+        <div class="mic-bar" id="b4"></div>
+        <div class="mic-bar" id="b5"></div>
+        <div class="mic-bar" id="b6"></div>
+        <div class="mic-bar" id="b7"></div>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT PANEL -->
+    <div class="transcript-panel">
+      <div class="transcript-label">
+        <span>🎙️</span> Your Answer Transcript
+      </div>
+      <div class="transcript-box" id="transcript">
+        <span class="transcript-placeholder">Press the mic button to start recording your answer...</span>
+      </div>
+    </div>
+
+    <!-- CONTROLS PANEL -->
+    <div class="controls-panel">
+      <!-- Hands-free toggle pill -->
+      <div
+        style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:5px 14px;cursor:pointer;"
+        onclick="toggleHandsFree()" id="hf-toggle">
+        <div id="hf-dot" style="width:8px;height:8px;border-radius:50%;background:#22c55e;transition:background 0.2s;">
+        </div>
+        <span id="hf-label"
+          style="font-size:11px;font-family:'Syne',sans-serif;font-weight:600;color:#22c55e;transition:color 0.2s;">Hands-Free
+          ON</span>
+      </div>
+
+      <div class="ctrl-row">
+        <!-- Mic -->
+        <div style="position:relative;margin-bottom:20px;">
+          <button class="ctrl-round btn-mic" id="mic-btn" onclick="toggleMic()">🎙️</button>
+          <div class="ctrl-tip">Mic</div>
+        </div>
+        <!-- Camera -->
+        <div style="position:relative;margin-bottom:20px;">
+          <button class="ctrl-round btn-cam" id="cam-btn" onclick="toggleCamera()">📷</button>
+          <div class="ctrl-tip">Camera</div>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="submit-btn" onclick="submitAnswer()" disabled>
+        <span id="submit-icon">→</span>
+        <span id="submit-text">Submit Answer</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Resize hint -->
+  <div class="resize-hint" id="resize-hint">↔ Drag dividers to resize panels · Double-click to reset</div>
+
+  <!-- ══ END MODAL ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="end-modal">
+    <div class="modal">
+      <div class="modal-icon">🎤</div>
+      <h2>End Interview?</h2>
+      <p>Your answers will be analyzed by AI and a detailed feedback report will be generated for you.</p>
+      <div class="modal-btns">
+        <button class="mbtn mbtn-ghost" onclick="hideEndModal()">Keep Going</button>
+        <button class="mbtn mbtn-red" onclick="endInterview()">End & Get Feedback</button>
+      </div>
+      <div id="download-box" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Your recording is ready!</p>
+        <button class="mbtn mbtn-ghost" onclick="downloadRecording()" style="width:100%;border-color:var(--accent);color:var(--accent2);">
+          📥 Download My Recording
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ANALYZING MODAL ════════════════════════════════ -->
+  <div class="modal-overlay" id="loading-modal">
+    <div class="modal">
+      <div class="analyzing-spinner"></div>
+      <br />
+      <h2>Analyzing Interview</h2>
+      <p>AI is reviewing all your answers and crafting a personalized feedback report. This takes a few seconds...</p>
+    </div>
+  </div>
+
+  <script>
+    // ── STATE ──────────────────────────────────────────────
+    let interviewId = null;
+    let currentQuestion = '';
+    let questionNumber = 0;
+    let seconds = 0;
+    let timerInterval = null;
+
+    // ── FOCUS & BEHAVIOR TRACKING ──
+    let focusTicks = 0;
+    let totalTicks = 0;
+    let distractionCounter = 0;
+    let focusTimeline = []; // 1 for focus, 0 for lost
+    let multipleFacesDetected = false;
+    let isAwaitingAnswer = false; // NEW: track if it's the user's turn to speak
+    let timelineInterval = null;
+    let socket = null; // NEW: WebSocket connection
+    let sessionRecorder = null; // NEW: Full session recording
+    let sessionChunks = [];
+    let eyeContactTicks = 0; // NEW: Track eye contact
+
+    let isRecording = false;
+    let mediaRecorder = null, audioChunks = [], recognition = null, transcript = '';
+    let cameraStream = null, cameraOn = false;
+    let audioContext = null, analyser = null, micSource = null, vizInterval = null;
+
+    // ── INIT ───────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+      currentUser = requireAuth('student');
+      if (!currentUser) return;
+      populateNav(currentUser);
+      document.getElementById('cam-name-text').textContent = currentUser.name.split(' ')[0];
+
+      const params = new URLSearchParams(window.location.search);
+      interviewId = params.get('id');
+      if (!interviewId) { window.location.href = '/student/dashboard.html'; return; }
+
+      // Setup camera early
+      await setupCamera();
+    });
+
+    async function beginSession() {
+      // Hide the start overlay
+      document.getElementById('start-overlay').classList.remove('show');
+      setTimeout(() => { document.getElementById('start-overlay').style.display = 'none'; }, 500);
+
+      // Run countdown and then fetch first question
+      await runCountdown();
+      startTimer();
+
+      // Start focus tracking
+      timelineInterval = setInterval(() => {
+        if (typeof totalTicks === 'undefined') return;
+        const lastFocus = (focusTicks / (totalTicks || 1)) > 0.5 ? 1 : 0;
+        focusTimeline.push(lastFocus);
+      }, 5000);
+
+      // Initialize WebSocket connection
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/ws/interview/${interviewId}?token=${getToken()}`;
+      socket = new WebSocket(wsUrl);
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        handleAIResponse(data);
+      };
+
+      socket.onclose = () => console.log('WebSocket connection closed');
+      socket.onerror = (err) => console.error('WebSocket error:', err);
+
+      // Start full session recording (Candidate only)
+      if (cameraStream) {
+        sessionChunks = [];
+        sessionRecorder = new MediaRecorder(cameraStream);
+        sessionRecorder.ondataavailable = e => { if (e.data.size > 0) sessionChunks.push(e.data); };
+        sessionRecorder.start(1000); // Save every second
+        console.log('🎥 Session recording started');
+      }
+
+      await fetchFirstQuestion();
+    }
+
+    function handleAIResponse(data) {
+      showThinking(false);
+      if (data.is_complete) {
+        typeQuestion(data.question || "That wraps up our interview! Well done.");
+        speak(data.question || "That wraps up our interview! Well done.", data.audio_b64);
+        setTimeout(() => endInterview(), 5000);
+        return;
+      }
+
+      questionNumber++;
+      currentQuestion = data.question;
+      updateProgress();
+      typeQuestion(currentQuestion);
+      speak(currentQuestion, data.audio_b64);
+
+      document.getElementById('submit-text').textContent = 'Submit Answer';
+      document.getElementById('mic-btn').disabled = false;
+    }
+
+    // ── COUNTDOWN ──────────────────────────────────────────
+    async function runCountdown() {
+      const overlay = document.getElementById('countdown');
+      const num = document.getElementById('countdown-num');
+      for (let i = 3; i >= 1; i--) {
+        num.textContent = i;
+        num.style.animation = 'none';
+        void num.offsetWidth;
+        num.style.animation = 'countPop 1s ease-in-out';
+        await sleep(1000);
+      }
+      num.textContent = 'GO!';
+      await sleep(700);
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.4s';
+      await sleep(400);
+      overlay.style.display = 'none';
+    }
+
+    // ── CAMERA ─────────────────────────────────────────────
+    async function setupCamera() {
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false
+        });
+        document.getElementById('cam-video').srcObject = cameraStream;
+        cameraOn = true;
+      } catch {
+        cameraOn = false;
+        document.getElementById('cam-video').style.display = 'none';
+        document.getElementById('cam-off').style.display = 'flex';
+        document.getElementById('cam-btn').classList.add('off');
+        document.getElementById('cam-pill').textContent = '🚫';
+      }
+    }
+
+    function toggleCamera() {
+      if (!cameraStream) return;
+      cameraOn = !cameraOn;
+      cameraStream.getVideoTracks().forEach(t => t.enabled = cameraOn);
+      document.getElementById('cam-video').style.display = cameraOn ? 'block' : 'none';
+      document.getElementById('cam-off').style.display = cameraOn ? 'none' : 'flex';
+      document.getElementById('cam-btn').classList.toggle('off', !cameraOn);
+      document.getElementById('cam-btn').textContent = cameraOn ? '📷' : '🚫';
+      document.getElementById('cam-pill').textContent = cameraOn ? '📷' : '🚫';
+
+      // Logic from monkey-patch to stop detection when cam is off
+      if (!cameraOn) {
+        clearInterval(faceDetectInterval);
+        const canvas = document.getElementById('face-canvas');
+        if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('face-dot').style.background = '#ef4444';
+        document.getElementById('face-label').textContent = 'Camera Off';
+      } else if (detector) {
+        startFaceDetectionLoop();
+      }
+    }
+
+    // ── TIMER ──────────────────────────────────────────────
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        seconds++;
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    // ── TTS ────────────────────────────────────────────────
+    // ── HANDS-FREE CONFIG ─────────────────────────────────
+    let handsFreeMode = true;
+    let silenceTimer = null;
+    let silenceTick = 0;
+    const SILENCE_LIMIT = 3; // seconds of silence before auto-submit
+    let hasSpoken = false;
+
+    function speak(text, audioB64 = null) {
+      window.speechSynthesis.cancel();
+      if (window.currentAudio) { window.currentAudio.pause(); window.currentAudio = null; }
+
+      setStatus('speaking', 'Speaking...');
+      document.getElementById('ai-avatar').classList.add('speaking');
+
+      const onSpeakEnd = () => {
+        document.getElementById('ai-avatar').classList.remove('speaking');
+        isAwaitingAnswer = true; // User can speak now
+        if (handsFreeMode) {
+          // Auto-start mic after AI finishes — hands-free
+          setTimeout(() => { if (!isRecording && isAwaitingAnswer) startRecording(); }, 700);
+        } else {
+          setStatus('ready', 'Listening to you');
+          showNotif('🎙️ Your turn — press Mic to answer');
+        }
+      };
+
+      if (audioB64) {
+        const audio = new Audio("data:audio/mp3;base64," + audioB64);
+        window.currentAudio = audio;
+        audio.onended = onSpeakEnd;
+        audio.play().catch(e => {
+          console.warn("Audio play failed, falling back to synthesis", e);
+          setStatus('speaking', 'Local Voice active (Server busy)');
+          fallbackSpeak(text, onSpeakEnd);
+        });
+      } else {
+        setStatus('speaking', 'Local Voice active (Network skip)');
+        fallbackSpeak(text, onSpeakEnd);
+      }
+    }
+
+    function fallbackSpeak(text, onEnd) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 0.95; utter.pitch = 1; utter.volume = 1;
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium'));
+      if (preferred) utter.voice = preferred;
+      utter.onend = onEnd;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // ── STATUS ─────────────────────────────────────────────
+    function setStatus(type, text) {
+      const dot = document.getElementById('status-dot');
+      const txt = document.getElementById('status-text');
+      dot.className = 'status-dot';
+      if (type === 'thinking') dot.classList.add('thinking');
+      else if (type === 'speaking') dot.classList.add('speaking');
+      txt.textContent = text;
+    }
+
+    // ── FIRST QUESTION ─────────────────────────────────────
+    async function fetchFirstQuestion() {
+      showThinking(true);
+      setStatus('thinking', 'Preparing your interview...');
+      try {
+        const res = await apiFetch('/interview/start', { method: 'POST', body: JSON.stringify({ interview_id: interviewId }) });
+        const data = await res.json();
+        currentQuestion = data.question;
+        questionNumber = 1;
+        showThinking(false);
+        typeQuestion(currentQuestion);
+        updateProgress();
+        speak(currentQuestion, data.audio_b64);
+      } catch (e) {
+        showThinking(false);
+        setStatus('ready', 'Error');
+        showNotif('❌ Failed to load question. Check your API key.');
+      }
+    }
+
+    // ── TYPE QUESTION ANIMATION ────────────────────────────
+    function typeQuestion(text) {
+      const el = document.getElementById('q-text');
+      el.textContent = '';
+      let i = 0;
+      const iv = setInterval(() => {
+        el.textContent += text[i++];
+        if (i >= text.length) clearInterval(iv);
+      }, 16);
+    }
+
+    function showThinking(show) {
+      document.getElementById('thinking').classList.toggle('show', show);
+      document.getElementById('q-text').style.visibility = show ? 'hidden' : 'visible';
+    }
+
+    // ── MIC ────────────────────────────────────────────────
+    async function toggleMic() {
+      if (isRecording) stopRecording();
+      else await startRecording();
+    }
+
+    async function startRecording() {
+      if (isRecording || !isAwaitingAnswer) return;
+      try {
+        window.speechSynthesis.cancel();
+        document.getElementById('ai-avatar').classList.remove('speaking');
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        // Audio visualizer
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 64;
+        micSource = audioContext.createMediaStreamSource(stream);
+        micSource.connect(analyser);
+        startMicViz();
+
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => stream.getTracks().forEach(t => t.stop());
+        mediaRecorder.start();
+        isRecording = true;
+        transcript = '';
+
+        document.getElementById('mic-btn').classList.add('active');
+        document.getElementById('mic-btn').textContent = '⏹️';
+        document.getElementById('rec-badge').classList.add('show');
+        document.getElementById('transcript').innerHTML = '<span style="color:var(--accent2);font-style:italic">Listening...</span>';
+        setStatus('ready', 'Recording your answer');
+        startSTT(stream);
+      } catch {
+        showNotif('❌ Microphone access denied. Please allow mic access.');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder?.state !== 'inactive') mediaRecorder.stop();
+      if (recognition) { try { recognition.stop(); } catch { } }
+      stopMicViz();
+      clearSilenceTimer();
+      isRecording = false;
+      hasSpoken = false;
+
+      document.getElementById('mic-btn').classList.remove('active');
+      document.getElementById('mic-btn').textContent = '🎙️';
+      document.getElementById('rec-badge').classList.remove('show');
+
+      if (transcript.trim()) {
+        document.getElementById('transcript').textContent = transcript;
+        document.getElementById('transcript').classList.add('has-text');
+        document.getElementById('submit-btn').disabled = false;
+        setStatus('ready', 'Answer recorded ✓');
+      } else {
+        document.getElementById('transcript').innerHTML = '<span class="transcript-placeholder">No speech detected. Speak clearly and try again.</span>';
+        setStatus('ready', 'No speech detected');
+        // In hands-free mode, auto-retry after pause ONLY if still awaiting answer
+        if (handsFreeMode && isAwaitingAnswer) {
+          setTimeout(() => { if (!isRecording && isAwaitingAnswer) startRecording(); }, 1500);
+        }
+      }
+    }
+
+    // ── SILENCE DETECTION (hands-free auto-submit) ──────────
+    function startSilenceTimer() {
+      clearSilenceTimer();
+      silenceTick = 0;
+      silenceTimer = setInterval(() => {
+        if (!isRecording) return clearSilenceTimer();
+        silenceTick++;
+        // Show countdown in status
+        const remaining = SILENCE_LIMIT - silenceTick;
+        if (silenceTick >= 1 && hasSpoken) {
+          setStatus('ready', remaining > 0
+            ? `Auto-submitting in ${remaining}s...`
+            : 'Submitting...');
+        }
+        if (silenceTick >= SILENCE_LIMIT && hasSpoken && transcript.trim()) {
+          clearSilenceTimer();
+          stopRecording();
+          setTimeout(() => submitAnswer(), 300);
+        }
+      }, 1000);
+    }
+
+    function clearSilenceTimer() {
+      clearInterval(silenceTimer);
+      silenceTimer = null;
+      silenceTick = 0;
+    }
+
+    function resetSilenceTimer() {
+      // Called whenever speech is detected
+      silenceTick = 0;
+    }
+
+    // ── MIC VISUALIZER ─────────────────────────────────────
+    function startMicViz() {
+      const bars = [b1, b2, b3, b4, b5, b6, b7];
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      vizInterval = setInterval(() => {
+        analyser.getByteFrequencyData(data);
+        bars.forEach((b, i) => {
+          const val = data[i * 2] || 0;
+          const h = Math.max(3, Math.min(24, (val / 255) * 24));
+          b.style.height = h + 'px';
+          b.style.opacity = isRecording ? 1 : 0.3;
+        });
+      }, 60);
+    }
+
+    function stopMicViz() {
+      clearInterval(vizInterval);
+      [b1, b2, b3, b4, b5, b6, b7].forEach(b => { b.style.height = '3px'; });
+      if (audioContext) { audioContext.close(); audioContext = null; }
+    }
+
+    // ── STT ────────────────────────────────────────────────
+    function startSTT() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        document.getElementById('transcript').contentEditable = 'true';
+        document.getElementById('transcript').textContent = 'Type your answer here...';
+        document.getElementById('submit-btn').disabled = false;
+        return;
+      }
+      recognition = new SR();
+      recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+      let finalT = '';
+      recognition.onresult = e => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) finalT += e.results[i][0].transcript + ' ';
+          else interim += e.results[i][0].transcript;
+        }
+        transcript = (finalT + interim).trim();
+        document.getElementById('transcript').textContent = transcript || 'Listening...';
+        document.getElementById('transcript').classList.toggle('has-text', !!transcript.trim());
+        if (transcript.trim()) {
+          document.getElementById('submit-btn').disabled = false;
+          hasSpoken = true;
+          // Reset silence timer every time speech detected
+          resetSilenceTimer();
+          // Start silence countdown after first speech
+          if (handsFreeMode && !silenceTimer) startSilenceTimer();
+        }
+      };
+      recognition.onspeechend = () => {
+        // Speech paused — start silence countdown
+        if (handsFreeMode && hasSpoken && transcript.trim()) {
+          startSilenceTimer();
+        }
+      };
+      recognition.onerror = () => { };
+      try { recognition.start(); } catch { }
+    }
+
+    // ── SUBMIT ─────────────────────────────────────────────
+    async function submitAnswer() {
+      const answer = transcript.trim() || document.getElementById('transcript').textContent.trim();
+      if (!answer || answer === 'Listening...' || answer.includes('speak your answer') || answer.includes('No speech')) {
+        showNotif('⚠️ Please speak your answer first'); return;
+      }
+      clearSilenceTimer();
+      if (isRecording) stopRecording();
+      document.getElementById('submit-btn').disabled = true;
+      document.getElementById('submit-text').textContent = 'Submitting...';
+      document.getElementById('mic-btn').disabled = true;
+      document.getElementById('transcript').innerHTML = '<span class="transcript-placeholder">Press the mic button to start recording your answer...</span>';
+      document.getElementById('transcript').classList.remove('has-text');
+      transcript = '';
+      isAwaitingAnswer = false; // Stop accepting speech
+
+      showThinking(true);
+      setStatus('thinking', 'Processing your answer...');
+
+      try {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ interview_id: interviewId, answer }));
+        } else {
+          // Fallback to fetch if socket closed
+          const res = await apiFetch('/interview/next', {
+            method: 'POST', body: JSON.stringify({ interview_id: interviewId, answer })
+          });
+          const data = await res.json();
+          handleAIResponse(data);
+        }
+      } catch (e) {
+        showThinking(false);
+        setStatus('ready', 'Error — try again');
+        document.getElementById('submit-text').textContent = 'Submit Answer';
+        document.getElementById('mic-btn').disabled = false;
+        showNotif('❌ Error getting next question. Please try again.');
+      }
+    }
+
+    // ── HANDS-FREE TOGGLE ─────────────────────────────────
+    function toggleHandsFree() {
+      handsFreeMode = !handsFreeMode;
+      const dot = document.getElementById('hf-dot');
+      const label = document.getElementById('hf-label');
+      if (handsFreeMode) {
+        dot.style.background = '#22c55e';
+        label.style.color = '#22c55e';
+        label.textContent = 'Hands-Free ON';
+        showNotif('✅ Hands-free mode ON — mic auto-starts after each question');
+      } else {
+        dot.style.background = 'rgba(255,255,255,0.3)';
+        label.style.color = 'rgba(255,255,255,0.4)';
+        label.textContent = 'Hands-Free OFF';
+        showNotif('⚠️ Manual mode — press mic button to record');
+        clearSilenceTimer();
+      }
+    }
+
+    function updateProgress() {
+      document.getElementById('q-chip').textContent = `Question ${questionNumber}`;
+      document.getElementById('q-progress').style.width = Math.min((questionNumber / 10) * 100, 95) + '%';
+    }
+
+    // ── NOTIFICATION ───────────────────────────────────────
+    let notifTimeout = null;
+    function showNotif(msg) {
+      const existing = document.querySelector('.notif');
+      if (existing) existing.remove();
+      clearTimeout(notifTimeout);
+      const n = document.createElement('div');
+      n.className = 'notif'; n.textContent = msg;
+      document.body.appendChild(n);
+      notifTimeout = setTimeout(() => n.remove(), 3500);
+    }
+
+    // ── MODALS ─────────────────────────────────────────────
+    function showEndModal() { document.getElementById('end-modal').classList.add('show'); }
+    function hideEndModal() { document.getElementById('end-modal').classList.remove('show'); }
+
+    async function endInterview() {
+      hideEndModal();
+      clearInterval(timerInterval);
+      window.speechSynthesis.cancel();
+      stopMicViz();
+      
+      document.getElementById('loading-modal').classList.add('show');
+      clearInterval(timelineInterval);
+      clearInterval(faceDetectInterval);
+      
+      // Stop session recording
+      if (sessionRecorder && sessionRecorder.state !== 'inactive') {
+        sessionRecorder.stop();
+        console.log('🎥 Session recording stopped');
+      }
+
+      const focusScore = totalTicks > 0 ? Math.round((focusTicks / totalTicks) * 100) : 100;
+      const eyeScore = focusTicks > 0 ? Math.round((eyeContactTicks / focusTicks) * 100) : 100;
+      
+      try {
+        const res = await apiFetch('/interview/end', {
+          method: 'POST',
+          body: JSON.stringify({
+            interview_id: interviewId,
+            focus_score: focusScore,
+            eye_contact_score: eyeScore, // Pass the new metric
+            focus_timeline: focusTimeline,
+            multiple_faces: multipleFacesDetected
+          })
+        });
+        if (res.ok) {
+          // Instead of immediate redirect, show download option if chunks exist
+          if (sessionChunks.length > 0) {
+            document.getElementById('loading-modal').classList.remove('show');
+            document.getElementById('end-modal').classList.add('show');
+            document.getElementById('download-box').style.display = 'block';
+            document.querySelector('#end-modal h2').textContent = 'Interview Complete!';
+            document.querySelector('#end-modal p').textContent = 'Your feedback report is ready. You can also download your recording below.';
+            const endBtn = document.querySelector('.mbtn-red');
+            endBtn.textContent = 'View Feedback Report';
+            endBtn.onclick = () => window.location.href = `/student/feedback.html?id=${interviewId}`;
+          } else {
+            window.location.href = `/student/feedback.html?id=${interviewId}`;
+          }
+        } else {
+          const err = await res.json();
+          document.getElementById('loading-modal').classList.remove('show');
+          const msg = err.detail || 'Could not generate feedback';
+          showNotif('❌ ' + msg);
+          if (res.status === 400) {
+            setTimeout(() => { document.getElementById('end-modal').classList.remove('show'); }, 500);
+          }
+        }
+      } catch (e) {
+        console.error('Feedback error:', e);
+        document.getElementById('loading-modal').classList.remove('show');
+        showNotif('❌ Error generating feedback. Please try again.');
+      }
+    }
+
+    function downloadRecording() {
+      if (sessionChunks.length === 0) return;
+      // Combine chunks into a single video file
+      const blob = new Blob(sessionChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `Vocalis_Interview_${interviewId}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    }
+
+    // ── UTILS ──────────────────────────────────────────────
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+
+    // ── RESIZABLE PANELS ───────────────────────────────────
+    (function initResizable() {
+      const layout = document.getElementById('layout');
+      const colDivider = document.getElementById('divider-col');
+      const rowDivider = document.getElementById('divider-row');
+
+      // ── COLUMN resize (left-right) ──
+
+      // ── COLUMN resize (left-right) ──
+      let isDraggingCol = false;
+      let startX = 0;
+      let startCols = [];
+
+      colDivider.addEventListener('mousedown', e => {
+        isDraggingCol = true;
+        startX = e.clientX;
+        const style = window.getComputedStyle(layout);
+        startCols = style.gridTemplateColumns.split(' ').map(v => parseFloat(v));
+        colDivider.classList.add('dragging');
+        document.body.classList.add('dragging-col');
+        e.preventDefault();
+      });
+
+      // ── ROW resize (up-down) ──
+      let isDraggingRow = false;
+      let startY = 0;
+      let startRows = [];
+
+      rowDivider.addEventListener('mousedown', e => {
+        isDraggingRow = true;
+        startY = e.clientY;
+        const style = window.getComputedStyle(layout);
+        startRows = style.gridTemplateRows.split(' ').map(v => parseFloat(v));
+        rowDivider.classList.add('dragging');
+        document.body.classList.add('dragging-row');
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', e => {
+        if (isDraggingCol) {
+          const delta = e.clientX - startX;
+          const layoutW = layout.offsetWidth;
+          // col[0] = left panel, col[1] = 8px divider, col[2] = right panel
+          let newLeft = Math.max(200, startCols[0] + delta);
+          let newRight = Math.max(160, layoutW - newLeft - 8);
+          // Clamp so right panel doesn't disappear
+          if (newRight < 160) { newRight = 160; newLeft = layoutW - 160 - 8; }
+          layout.style.gridTemplateColumns = `${newLeft}px 8px ${newRight}px`;
+        }
+
+        if (isDraggingRow) {
+          const delta = e.clientY - startY;
+          const layoutH = layout.offsetHeight;
+          let newTop = Math.max(120, startRows[0] + delta);
+          let newBottom = Math.max(80, layoutH - newTop - 8);
+          if (newBottom < 80) { newBottom = 80; newTop = layoutH - 80 - 8; }
+          layout.style.gridTemplateRows = `${newTop}px 8px ${newBottom}px`;
+        }
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (isDraggingCol) {
+          isDraggingCol = false;
+          colDivider.classList.remove('dragging');
+          document.body.classList.remove('dragging-col');
+        }
+        if (isDraggingRow) {
+          isDraggingRow = false;
+          rowDivider.classList.remove('dragging');
+          document.body.classList.remove('dragging-row');
+        }
+      });
+
+      // Touch support
+      colDivider.addEventListener('touchstart', e => {
+        isDraggingCol = true;
+        startX = e.touches[0].clientX;
+        const style = window.getComputedStyle(layout);
+        startCols = style.gridTemplateColumns.split(' ').map(v => parseFloat(v));
+        e.preventDefault();
+      }, { passive: false });
+
+      rowDivider.addEventListener('touchstart', e => {
+        isDraggingRow = true;
+        startY = e.touches[0].clientY;
+        const style = window.getComputedStyle(layout);
+        startRows = style.gridTemplateRows.split(' ').map(v => parseFloat(v));
+        e.preventDefault();
+      }, { passive: false });
+
+      document.addEventListener('touchmove', e => {
+        if (isDraggingCol) {
+          const delta = e.touches[0].clientX - startX;
+          const layoutW = layout.offsetWidth;
+          let newLeft = Math.max(200, startCols[0] + delta);
+          let newRight = Math.max(160, layoutW - newLeft - 8);
+          layout.style.gridTemplateColumns = `${newLeft}px 8px ${newRight}px`;
+        }
+        if (isDraggingRow) {
+          const delta = e.touches[0].clientY - startY;
+          const layoutH = layout.offsetHeight;
+          let newTop = Math.max(120, startRows[0] + delta);
+          let newBottom = Math.max(80, layoutH - newTop - 8);
+          layout.style.gridTemplateRows = `${newTop}px 8px ${newBottom}px`;
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchend', () => {
+        isDraggingCol = false;
+        isDraggingRow = false;
+      });
+
+      // Show hint briefly on first load
+      const hint = document.getElementById('resize-hint');
+      setTimeout(() => { hint.classList.add('show'); }, 2000);
+      setTimeout(() => { hint.classList.remove('show'); }, 5000);
+
+      // Double-click divider to reset to default
+      colDivider.addEventListener('dblclick', () => {
+        layout.style.gridTemplateColumns = '1fr 8px 300px';
+      });
+      rowDivider.addEventListener('dblclick', () => {
+        layout.style.gridTemplateRows = '1fr 8px 160px';
+      });
+    })();
+  </script>
+
+  <!-- MediaPipe Face Detection Logic -->
+  <script>
+    let detector = null;
+    let faceDetectInterval = null;
+
+    async function initFaceDetection() {
+      console.log('🚀 Initializing MediaPipe Face Detection...');
+      try {
+        const model = faceDetection.SupportedModels.MediaPipeFaceDetector;
+        detector = await faceDetection.createDetector(model, {
+          runtime: 'tfjs',
+          modelType: 'short'
+        });
+        console.log('✅ Face Detector Ready');
+        startFaceDetectionLoop();
+      } catch (e) {
+        console.error('Face detection init failed:', e);
+      }
+    }
+
+    function startFaceDetectionLoop() {
+      if (faceDetectInterval) clearInterval(faceDetectInterval);
+      faceDetectInterval = setInterval(async () => {
+        if (!detector || !cameraOn) return;
+        await detectFaces();
+      }, 300);
+    }
+
+    async function detectFaces() {
+      const video = document.getElementById('cam-video');
+      const canvas = document.getElementById('face-canvas');
+      if (!video || video.readyState !== 4 || !canvas) return;
+
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+      if (!vw || !vh) return;
+      canvas.width = vw;
+      canvas.height = vh;
+      const ctx = canvas.getContext('2d');
+
+      try {
+        const faces = await detector.estimateFaces(video);
+        ctx.clearRect(0, 0, vw, vh);
+
+        totalTicks++;
+        if (faces.length > 0) {
+          focusTicks++;
+          distractionCounter = 0;
+          document.getElementById('cam-tile').style.borderColor = 'var(--border)';
+          
+          if (faces.length > 1) multipleFacesDetected = true;
+
+          // Draw modern detection corners
+          ctx.strokeStyle = '#22c55e';
+          ctx.lineWidth = 3;
+          ctx.shadowColor = '#22c55e';
+          ctx.shadowBlur = 8;
+
+          faces.forEach(face => {
+            const box = face.box;
+            const x = box.xMin, y = box.yMin, w = box.width, h = box.height;
+            const cLen = Math.min(w, h) * 0.2;
+
+            ctx.beginPath();
+            ctx.moveTo(x + cLen, y); ctx.lineTo(x, y); ctx.lineTo(x, y + cLen);
+            ctx.moveTo(x + w - cLen, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + cLen);
+            ctx.moveTo(x, y + h - cLen); ctx.lineTo(x, y + h); ctx.lineTo(x + cLen, y + h);
+            ctx.moveTo(x + w - cLen, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w, y + h - cLen);
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = 'rgba(34,197,94,0.85)';
+            ctx.fillRect(x, y - 22, 100, 20);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px Syne, sans-serif';
+            ctx.fillText('FACE DETECTED', x + 6, y - 7);
+          });
+
+          // Confidence / Eye Tracking Logic
+          const face = faces[0];
+          if (face.keypoints) {
+            const re = face.keypoints[0]; // Right eye
+            const le = face.keypoints[1]; // Left eye
+            const nose = face.keypoints[2]; // Nose tip
+
+            // Calculate "Gaze" - is the nose centered between the eyes?
+            // Ratio should be ~0.5 if looking straight.
+            const eyeDist = Math.abs(le.x - re.x);
+            const nosePos = (nose.x - Math.min(re.x, le.x)) / eyeDist;
+            
+            const lookingAtCamera = nosePos > 0.35 && nosePos < 0.65;
+            if (lookingAtCamera) eyeContactTicks++;
+
+            // Visual feedback for gaze
+            ctx.fillStyle = lookingAtCamera ? '#22c55e' : '#ef4444';
+            ctx.beginPath();
+            ctx.arc(nose.x, nose.y, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            if (!lookingAtCamera) {
+              ctx.fillStyle = '#ef4444';
+              ctx.font = 'bold 10px Syne, sans-serif';
+              ctx.fillText('LOOK AT CAMERA', face.box.xMin, face.box.yMin - 30);
+            }
+          }
+
+          document.getElementById('face-dot').style.background = '#22c55e';
+          document.getElementById('face-label').textContent = faces.length > 1 ? `${faces.length} Faces Detected` : 'Face Detected';
+          document.getElementById('face-status').style.borderColor = 'rgba(34,197,94,0.3)';
+
+        } else {
+          distractionCounter++;
+          if (distractionCounter > 10) {
+            document.getElementById('cam-tile').style.borderColor = 'var(--red)';
+          }
+          document.getElementById('face-dot').style.background = '#ef4444';
+          document.getElementById('face-label').textContent = 'No Face';
+          document.getElementById('face-status').style.borderColor = 'rgba(239,68,68,0.3)';
+        }
+      } catch (e) {
+        console.warn('Face detection error:', e);
+      }
+    }
+
+    // Call init on load (after camera is checked)
+    const originalBegin = beginSession;
+    beginSession = async function() {
+      await originalBegin();
+      initFaceDetection();
+    };
+  </script>
+  </script>
+</body>
+
+</html>
