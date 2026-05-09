@@ -42,5 +42,3 @@ Every session ends with a comprehensive **Elite Feedback Report**.
 
 - **Privacy First**: All video processing and behavioral tracking happen **locally** in your browser. Your recording is yours to keep and is never stored on our servers.
 - **Cinematic Aesthetic**: From the floating pill navigation to the film-grain textures, every pixel of Vocalis is designed to feel like a premium, world-class product.
-
-Built with ❤️ by the Vocalis Team.
