@@ -7,9 +7,6 @@ Live link : https://vocalis-ai-omyf.onrender.com/
 
 ## ✨ Signature Features
 
-### 🌊 Cinematic Interaction Design
-The platform features a **"Cyber-Dark" Cinematic UI** that creates a calm yet high-tech preparation environment, allowing users to focus entirely on their performance.
-
 ### 🎙️ Natural Voice Dialogue
 Experience fluid, zero-latency conversations. Vocalis uses a persistent **WebSocket architecture** to ensure your dialogue with the AI feels human, allowing for natural pauses, follow-up questions, and deep technical probing.
 
@@ -42,4 +39,3 @@ Every session ends with a comprehensive **Elite Feedback Report**.
 ## 🛡️ Privacy & Professionalism
 
 - **Privacy First**: All video processing and behavioral tracking happen **locally** in your browser. Your recording is yours to keep and is never stored on our servers.
-- **Cinematic Aesthetic**: From the floating pill navigation to the film-grain textures, every pixel of Vocalis is designed to feel like a premium, world-class product.
