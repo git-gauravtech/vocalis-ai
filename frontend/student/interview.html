@@ -1364,12 +1364,29 @@
     }
 
     // ── TIMER ──────────────────────────────────────────────
+    const MAX_INTERVIEW_SECONDS = 20 * 60; // 20 minutes
+
     function startTimer() {
       timerInterval = setInterval(() => {
         seconds++;
         const m = String(Math.floor(seconds / 60)).padStart(2, '0');
         const s = String(seconds % 60).padStart(2, '0');
-        document.getElementById('timer').textContent = `${m}:${s}`;
+        const timerEl = document.getElementById('timer');
+        timerEl.textContent = `${m}:${s}`;
+
+        // Warning at 18 min — turn yellow
+        if (seconds === 18 * 60) {
+          timerEl.style.color = '#f59e0b';
+          showToast('⏱️ 2 minutes remaining in this session!', 'warning');
+        }
+
+        // Hard stop at 20 min
+        if (seconds >= MAX_INTERVIEW_SECONDS) {
+          timerEl.style.color = '#ef4444';
+          clearInterval(timerInterval);
+          showToast('⏰ Time limit reached (20 min). Ending interview...', 'error');
+          setTimeout(() => endInterview(), 2000);
+        }
       }, 1000);
     }
 

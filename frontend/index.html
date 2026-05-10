@@ -211,41 +211,79 @@ nav.scrolled {
 </section>
 
 <section class="section" id="features">
-  <div class="section-title">Built for Real Results</div>
+  <!-- Social proof bar -->
+  <div style="display:flex; justify-content:center; gap:60px; margin-bottom:80px; flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <div style="font-family:'Syne',sans-serif; font-size:36px; font-weight:800;">20min</div>
+      <div style="font-size:13px; color:var(--text-dim); margin-top:4px;">Max session length</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-family:'Syne',sans-serif; font-size:36px; font-weight:800;">5+</div>
+      <div style="font-size:13px; color:var(--text-dim); margin-top:4px;">Interview tracks</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-family:'Syne',sans-serif; font-size:36px; font-weight:800;">100%</div>
+      <div style="font-size:13px; color:var(--text-dim); margin-top:4px;">Private & secure</div>
+    </div>
+  </div>
+
+  <div class="section-title">Not Just Another Mock Interview</div>
   <div class="feat-grid">
     <div class="feat-card reveal">
-      <div style="font-size:32px; margin-bottom:24px;">🎙️</div>
+      <div style="margin-bottom:24px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
       <h3>Real-Time Voice</h3>
-      <p>WebSocket architecture for natural conversation. No lag, just fluid dialogue like a real call.</p>
+      <p style="color:var(--text-dim); margin-top:10px; line-height:1.7;">Speak naturally — no typing. WebSocket-powered conversation that responds in seconds, not minutes.</p>
     </div>
     <div class="feat-card reveal">
-      <div style="font-size:32px; margin-bottom:24px;">👁️</div>
-      <h3>Body Language</h3>
-      <p>Our AI tracks your eye-contact and posture. Get coached on how you look, not just what you say.</p>
+      <div style="margin-bottom:24px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="12" cy="8" r="4"/><path d="M1 22c0-5 4.5-9 11-9s11 4 11 9"/><circle cx="12" cy="8" r="1.5" fill="#6366f1"/>
+        </svg>
+      </div>
+      <h3>Body Language Scoring</h3>
+      <p style="color:var(--text-dim); margin-top:10px; line-height:1.7;">Our camera AI tracks eye contact and focus — because how you present matters just as much as what you say.</p>
     </div>
     <div class="feat-card reveal">
-      <div style="font-size:32px; margin-bottom:24px;">📈</div>
-      <h3>Honest Feedback</h3>
-      <p>Get a detailed breakdown of your strengths and where you need to improve to land the offer.</p>
+      <div style="margin-bottom:24px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <h3>Actionable Feedback</h3>
+      <p style="color:var(--text-dim); margin-top:10px; line-height:1.7;">No vague "good job". Get a scored breakdown — technical depth, communication, confidence — with exactly what to fix.</p>
     </div>
   </div>
 </section>
 
 <section class="section" id="how">
-  <div class="section-title">How It Works</div>
+  <div class="section-title">Three Steps. One Offer.</div>
   <div style="max-width:900px; margin:0 auto;">
     <div class="step-row reveal">
       <div class="step-num">01</div>
       <div>
-        <h3 style="font-family:Syne; font-size:32px; margin-bottom:12px;">Sync Your Resume</h3>
-        <p style="color:var(--text-dim); font-size:18px; font-weight:300; line-height:1.6;">Upload your PDF. Our AI learns your stack and experience to build a custom interview track just for you.</p>
+        <div style="font-size:11px; color:var(--accent); font-weight:700; letter-spacing:3px; margin-bottom:8px;">UPLOAD</div>
+        <h3 style="font-family:Syne; font-size:32px; margin-bottom:12px;">Drop Your Resume</h3>
+        <p style="color:var(--text-dim); font-size:18px; font-weight:300; line-height:1.6;">Vocalis reads your actual experience and builds a custom interview session around your stack — not a generic template.</p>
       </div>
     </div>
     <div class="step-row reveal">
       <div class="step-num" style="order:2">02</div>
       <div style="order:1; text-align:right;">
-        <h3 style="font-family:Syne; font-size:32px; margin-bottom:12px;">Practice Privately</h3>
-        <p style="color:var(--text-dim); font-size:18px; font-weight:300; line-height:1.6;">Go through a full session. The AI adjusts its difficulty based on how well you're doing in real-time.</p>
+        <div style="font-size:11px; color:var(--accent); font-weight:700; letter-spacing:3px; margin-bottom:8px;">PRACTICE</div>
+        <h3 style="font-family:Syne; font-size:32px; margin-bottom:12px;">Interview in Private</h3>
+        <p style="color:var(--text-dim); font-size:18px; font-weight:300; line-height:1.6;">No judgment. No pressure. Just you and an AI that adapts its difficulty in real-time based on how sharp your answers are.</p>
+      </div>
+    </div>
+    <div class="step-row reveal">
+      <div class="step-num">03</div>
+      <div>
+        <div style="font-size:11px; color:var(--accent); font-weight:700; letter-spacing:3px; margin-bottom:8px;">IMPROVE</div>
+        <h3 style="font-family:Syne; font-size:32px; margin-bottom:12px;">Get Your Report Card</h3>
+        <p style="color:var(--text-dim); font-size:18px; font-weight:300; line-height:1.6;">After every session, a detailed AI report scores your technical depth, communication, confidence, and body language — with exact action items to fix before the real thing.</p>
       </div>
     </div>
   </div>
@@ -273,9 +311,10 @@ nav.scrolled {
   </div>
 </section>
 
-<footer style="padding: 100px 6vw 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 1;">
-  <div class="nav-logo" style="margin-bottom: 40px;">Voca<span>lis</span></div>
-  <div style="font-size:12px; color:var(--text-dim);">© 2025 Vocalis AI. Built for better interviews.</div>
+<footer style="padding: 100px 6vw 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 1;">
+  <div class="nav-logo" style="margin-bottom: 20px; font-size:28px;">Voca<span>lis</span></div>
+  <p style="font-size:14px; color:var(--text-dim); max-width:400px; margin:0 auto 32px; line-height:1.7;">Built to help real people land real jobs. Not a product. A practice partner.</p>
+  <div style="font-size:12px; color:rgba(255,255,255,0.2);">© 2026 Vocalis AI — All rights reserved.</div>
 </footer>
 
 <script>
