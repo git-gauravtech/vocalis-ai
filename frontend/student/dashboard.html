@@ -85,12 +85,20 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 .cal-day { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--accent2); line-height: 1; margin-bottom: 8px; }
 .cal-weekday { font-size: 16px; font-weight: 500; }
 
-.saved-notes-list { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px; max-height: 200px; overflow-y: auto; }
+.saved-notes-list { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; max-height: 220px; overflow-y: auto; display: none; }
+.saved-notes-list.open { display: block; }
 .note-item { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px; margin-bottom: 12px; position: relative; }
 .note-text { font-size: 14px; line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; }
 .note-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); }
 .note-actions span { cursor: pointer; margin-left: 12px; transition: color 0.2s; }
 .note-actions span:hover { color: var(--accent); }
+.notes-footer { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.toggle-notes-btn { background: rgba(99,102,241,0.15); border: 1px solid var(--accent); color: var(--accent); font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 100px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.toggle-notes-btn:hover { background: var(--accent); color: #fff; }
+.notes-count { font-size: 12px; color: var(--text-dim); }
+.history-toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; cursor: pointer; }
+.history-toggle-btn { width: 32px; height: 32px; border-radius: 50%; background: rgba(99,102,241,0.15); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 16px; transition: all 0.2s; }
+.history-toggle-btn:hover { background: var(--accent); color: #fff; }
 
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
 </style>
@@ -141,7 +149,11 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
           <span>Personal Notes</span>
           <span style="font-size:12px; color:var(--text-dim); font-weight:400; cursor:pointer;" onclick="saveNotes()">Save Note</span>
         </div>
-        <textarea id="student-notes" class="notepad-area" style="min-height: 80px;" placeholder="Jot down formulas, behavioral stories, or target companies..."></textarea>
+        <textarea id="student-notes" class="notepad-area" style="min-height: 80px;"></textarea>
+        <div class="notes-footer">
+          <button class="toggle-notes-btn" id="notes-toggle-btn" onclick="toggleNotesList()">View History</button>
+          <span class="notes-count" id="notes-count"></span>
+        </div>
         <div id="saved-notes" class="saved-notes-list"></div>
       </div>
       <div class="prod-card calendar-widget">
@@ -152,8 +164,11 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
       </div>
     </div>
 
-    <div class="history-title reveal" style="margin-bottom: 24px; font-family: 'Syne'; font-size: 22px; font-weight: 700;">Performance History</div>
-    <div id="history-list" class="reveal"></div>
+    <div class="history-toggle-row reveal" onclick="toggleHistoryList()">
+      <div style="font-family: 'Syne'; font-size: 22px; font-weight: 700;">Performance History</div>
+      <div class="history-toggle-btn" id="history-toggle-btn">＋</div>
+    </div>
+    <div id="history-list" style="display:none;"></div>
   </div>
 
   <!-- Performance View -->
@@ -251,6 +266,9 @@ async function saveNotes() {
 
 function renderNotes() {
   const container = document.getElementById('saved-notes');
+  const countEl = document.getElementById('notes-count');
+  if (countEl) countEl.textContent = globalNotes.length ? `${globalNotes.length} note${globalNotes.length > 1 ? 's' : ''} saved` : '';
+
   if (!globalNotes.length) {
     container.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;">No notes saved yet.</div>';
     return;
@@ -289,6 +307,21 @@ async function deleteNote(id) {
   });
   
   if (res.ok) renderNotes();
+}
+
+function toggleNotesList() {
+  const list = document.getElementById('saved-notes');
+  const btn = document.getElementById('notes-toggle-btn');
+  const isOpen = list.classList.toggle('open');
+  btn.textContent = isOpen ? 'Hide History' : 'View History';
+}
+
+function toggleHistoryList() {
+  const list = document.getElementById('history-list');
+  const btn = document.getElementById('history-toggle-btn');
+  const isOpen = list.style.display === 'block';
+  list.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '＋' : '－';
 }
 
 function switchTab(tab) {
