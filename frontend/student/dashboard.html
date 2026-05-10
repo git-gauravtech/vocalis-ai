@@ -74,6 +74,17 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 .chart-container { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 32px; padding: 32px; margin-bottom: 32px; height: 350px; }
 
 .reveal { animation: fadeInUp 0.8s ease both; }
+
+.productivity-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 48px; }
+.prod-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; }
+.prod-header { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.notepad-area { flex: 1; background: transparent; border: none; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 14px; line-height: 1.6; resize: none; outline: none; width: 100%; min-height: 150px; }
+.notepad-area::placeholder { color: var(--text-dim); }
+.calendar-widget { text-align: center; }
+.cal-month { font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+.cal-day { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--accent2); line-height: 1; margin-bottom: 8px; }
+.cal-weekday { font-size: 16px; font-weight: 500; }
+
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
 </style>
 </head>
@@ -115,6 +126,24 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
     </div>
 
     <div id="stats-grid" class="grid-3 reveal" style="margin-bottom:48px;"></div>
+    
+    <!-- Productivity Hub -->
+    <div class="productivity-grid reveal">
+      <div class="prod-card">
+        <div class="prod-header">
+          <span>Personal Notes</span>
+          <span style="font-size:12px; color:var(--text-dim); font-weight:400; cursor:pointer;" onclick="saveNotes()">Save</span>
+        </div>
+        <textarea id="student-notes" class="notepad-area" placeholder="Jot down formulas, behavioral stories, or target companies..."></textarea>
+      </div>
+      <div class="prod-card calendar-widget">
+        <div class="prod-header" style="justify-content:center;">Today</div>
+        <div id="cal-month" class="cal-month">MONTH</div>
+        <div id="cal-day" class="cal-day">00</div>
+        <div id="cal-weekday" class="cal-weekday">Weekday</div>
+      </div>
+    </div>
+
     <div class="history-title reveal" style="margin-bottom: 24px; font-family: 'Syne'; font-size: 22px; font-weight: 700;">Performance History</div>
     <div id="history-list" class="reveal"></div>
   </div>
@@ -149,12 +178,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   populateNav(user);
   document.getElementById('user-first').textContent = user.name.split(' ')[0];
 
+  // Initialize Calendar
+  const today = new Date();
+  document.getElementById('cal-month').textContent = today.toLocaleString('default', { month: 'short' });
+  document.getElementById('cal-day').textContent = today.getDate().toString().padStart(2, '0');
+  document.getElementById('cal-weekday').textContent = today.toLocaleString('default', { weekday: 'long' });
+
+  // Initialize Notepad
+  const savedNotes = localStorage.getItem(`notes_${user._id}`);
+  if (savedNotes) document.getElementById('student-notes').value = savedNotes;
+
   const res = await apiFetch('/interview/history');
   const data = await res.json();
   globalInterviews = data.interviews || [];
   
   renderSessions(globalInterviews);
 });
+
+function saveNotes() {
+  const user = getUser();
+  const notes = document.getElementById('student-notes').value;
+  if (user) {
+    localStorage.setItem(`notes_${user._id}`, notes);
+    showToast('Notes saved successfully', 'success');
+  }
+}
 
 function switchTab(tab) {
   // Update Tab Styling
