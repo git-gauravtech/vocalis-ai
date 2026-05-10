@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends, Header, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from typing import Optional
 import os
 import json
@@ -30,8 +30,9 @@ app.add_middleware(
 )
 
 @app.get("/health")
+@app.head("/health")
 async def health_check():
-    return {"status": "ok"}
+    return PlainTextResponse("OK")
 
 
 def get_current_user(authorization: str = Header(None)):
