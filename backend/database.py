@@ -51,7 +51,7 @@ def upsert_user(google_id, name, email, picture):
         return get_user_by_google_id(google_id)
     return create_user(google_id, name, email, picture)
 
-def update_user_notes(user_id: str, notes: str):
+def update_user_notes(user_id: str, notes: list):
     try:
         users_col.update_one({"_id": ObjectId(user_id)}, {"$set": {"notes": notes}})
         return True

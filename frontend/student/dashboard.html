@@ -85,6 +85,13 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 .cal-day { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--accent2); line-height: 1; margin-bottom: 8px; }
 .cal-weekday { font-size: 16px; font-weight: 500; }
 
+.saved-notes-list { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px; max-height: 200px; overflow-y: auto; }
+.note-item { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px; margin-bottom: 12px; position: relative; }
+.note-text { font-size: 14px; line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; }
+.note-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); }
+.note-actions span { cursor: pointer; margin-left: 12px; transition: color 0.2s; }
+.note-actions span:hover { color: var(--accent); }
+
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
 </style>
 </head>
@@ -132,9 +139,10 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
       <div class="prod-card">
         <div class="prod-header">
           <span>Personal Notes</span>
-          <span style="font-size:12px; color:var(--text-dim); font-weight:400; cursor:pointer;" onclick="saveNotes()">Save</span>
+          <span style="font-size:12px; color:var(--text-dim); font-weight:400; cursor:pointer;" onclick="saveNotes()">Save Note</span>
         </div>
-        <textarea id="student-notes" class="notepad-area" placeholder="Jot down formulas, behavioral stories, or target companies..."></textarea>
+        <textarea id="student-notes" class="notepad-area" style="min-height: 80px;" placeholder="Jot down formulas, behavioral stories, or target companies..."></textarea>
+        <div id="saved-notes" class="saved-notes-list"></div>
       </div>
       <div class="prod-card calendar-widget">
         <div class="prod-header" style="justify-content:center;">Today</div>
@@ -171,6 +179,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 
 <script>
 let globalInterviews = [];
+let globalNotes = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
   const user = requireAuth('student');
@@ -188,7 +197,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const meRes = await apiFetch('/auth/me');
   if (meRes.ok) {
     const meData = await meRes.json();
-    if (meData.notes) document.getElementById('student-notes').value = meData.notes;
+    globalNotes = Array.isArray(meData.notes) ? meData.notes : [];
+    renderNotes();
   }
 
   const res = await apiFetch('/interview/history');
@@ -199,23 +209,86 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function saveNotes() {
-  const notes = document.getElementById('student-notes').value;
+  const textarea = document.getElementById('student-notes');
+  const text = textarea.value.trim();
+  if (!text) return;
+
   const btn = document.querySelector('.prod-header span:last-child');
   btn.textContent = 'Saving...';
   
+  const editingId = textarea.dataset.editId;
+  if (editingId) {
+    const note = globalNotes.find(n => n.id === editingId);
+    if (note) {
+      note.text = text;
+      note.date = new Date().toISOString();
+    }
+    delete textarea.dataset.editId;
+  } else {
+    globalNotes.unshift({
+      id: Date.now().toString(),
+      text: text,
+      date: new Date().toISOString()
+    });
+  }
+  
   const res = await apiFetch('/student/notes', {
     method: 'POST',
-    body: JSON.stringify({ notes })
+    body: JSON.stringify({ notes: globalNotes })
   });
 
   if (res.ok) {
     btn.textContent = 'Saved!';
-    setTimeout(() => btn.textContent = 'Save', 2000);
-    showToast('Notes saved to cloud securely', 'success');
+    setTimeout(() => btn.textContent = 'Save Note', 2000);
+    textarea.value = '';
+    renderNotes();
+    showToast('Note saved securely', 'success');
   } else {
-    btn.textContent = 'Save';
-    showToast('Failed to save notes', 'error');
+    btn.textContent = 'Save Note';
+    showToast('Failed to save note', 'error');
   }
+}
+
+function renderNotes() {
+  const container = document.getElementById('saved-notes');
+  if (!globalNotes.length) {
+    container.innerHTML = '<div style="color:var(--text-dim);font-size:13px;text-align:center;">No notes saved yet.</div>';
+    return;
+  }
+  container.innerHTML = globalNotes.map(n => `
+    <div class="note-item">
+      <div class="note-text">${n.text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+      <div class="note-meta">
+        <span>${new Date(n.date).toLocaleDateString()} ${new Date(n.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        <div class="note-actions">
+          <span onclick="editNote('${n.id}')">Edit</span>
+          <span onclick="deleteNote('${n.id}')" style="color:#ef4444;">Delete</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editNote(id) {
+  const note = globalNotes.find(n => n.id === id);
+  if (note) {
+    const textarea = document.getElementById('student-notes');
+    textarea.value = note.text;
+    textarea.dataset.editId = note.id;
+    textarea.focus();
+  }
+}
+
+async function deleteNote(id) {
+  if (!confirm("Delete this note?")) return;
+  globalNotes = globalNotes.filter(n => n.id !== id);
+  
+  const res = await apiFetch('/student/notes', {
+    method: 'POST',
+    body: JSON.stringify({ notes: globalNotes })
+  });
+  
+  if (res.ok) renderNotes();
 }
 
 function switchTab(tab) {

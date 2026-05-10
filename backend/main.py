@@ -69,7 +69,7 @@ async def get_me(user=Depends(get_current_user)):
 
 @app.post("/student/notes")
 async def save_student_notes(data: dict, user=Depends(get_current_user)):
-    notes = data.get("notes", "")
+    notes = data.get("notes", [])
     success = update_user_notes(user["_id"], notes)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to save notes")
