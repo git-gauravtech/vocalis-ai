@@ -13,7 +13,7 @@ from database import (
     update_last_answer, append_question,
     save_feedback, get_student_interviews,
     get_analytics, get_all_students,
-    save_contact_message
+    save_contact_message, update_user_notes
 )
 from pdf_parser import extract_text_from_pdf
 from gemini import get_next_question, generate_feedback
@@ -66,6 +66,14 @@ async def google_auth(data: dict):
 @app.get("/auth/me")
 async def get_me(user=Depends(get_current_user)):
     return user
+
+@app.post("/student/notes")
+async def save_student_notes(data: dict, user=Depends(get_current_user)):
+    notes = data.get("notes", "")
+    success = update_user_notes(user["_id"], notes)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to save notes")
+    return {"message": "Notes saved"}
 
 @app.post("/interview/upload-resume")
 async def upload_resume(

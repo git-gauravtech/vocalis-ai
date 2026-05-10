@@ -184,9 +184,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('cal-day').textContent = today.getDate().toString().padStart(2, '0');
   document.getElementById('cal-weekday').textContent = today.toLocaleString('default', { weekday: 'long' });
 
-  // Initialize Notepad
-  const savedNotes = localStorage.getItem(`notes_${user._id}`);
-  if (savedNotes) document.getElementById('student-notes').value = savedNotes;
+  // Initialize Notepad from Database
+  const meRes = await apiFetch('/auth/me');
+  if (meRes.ok) {
+    const meData = await meRes.json();
+    if (meData.notes) document.getElementById('student-notes').value = meData.notes;
+  }
 
   const res = await apiFetch('/interview/history');
   const data = await res.json();
@@ -195,12 +198,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderSessions(globalInterviews);
 });
 
-function saveNotes() {
-  const user = getUser();
+async function saveNotes() {
   const notes = document.getElementById('student-notes').value;
-  if (user) {
-    localStorage.setItem(`notes_${user._id}`, notes);
-    showToast('Notes saved successfully', 'success');
+  const btn = document.querySelector('.prod-header span:last-child');
+  btn.textContent = 'Saving...';
+  
+  const res = await apiFetch('/student/notes', {
+    method: 'POST',
+    body: JSON.stringify({ notes })
+  });
+
+  if (res.ok) {
+    btn.textContent = 'Saved!';
+    setTimeout(() => btn.textContent = 'Save', 2000);
+    showToast('Notes saved to cloud securely', 'success');
+  } else {
+    btn.textContent = 'Save';
+    showToast('Failed to save notes', 'error');
   }
 }
 

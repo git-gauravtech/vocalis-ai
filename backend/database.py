@@ -51,6 +51,13 @@ def upsert_user(google_id, name, email, picture):
         return get_user_by_google_id(google_id)
     return create_user(google_id, name, email, picture)
 
+def update_user_notes(user_id: str, notes: str):
+    try:
+        users_col.update_one({"_id": ObjectId(user_id)}, {"$set": {"notes": notes}})
+        return True
+    except Exception:
+        return False
+
 
 # ── INTERVIEWS ─────────────────────────────────────────
 def create_interview(student_id, company, role, interview_type, resume_text):
