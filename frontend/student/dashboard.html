@@ -101,6 +101,18 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 .history-toggle-btn:hover { background: var(--accent); color: #fff; }
 
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+/* ── RESPONSIVE DESIGN ── */
+@media (max-width: 768px) {
+  .nav { padding: 15px 20px; flex-direction: column; gap: 15px; }
+  .page { padding: 80px 20px 40px; }
+  .start-card { flex-direction: column; padding: 30px; text-align: center; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .productivity-grid { grid-template-columns: 1fr; }
+  .interview-row { grid-template-columns: 1fr; text-align: center; gap: 10px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .chart-container { height: auto; min-height: 250px; }
+}
 </style>
 </head>
 <body>

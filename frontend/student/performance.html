@@ -55,6 +55,16 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 
 .reveal { animation: fadeInUp 0.8s ease both; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+/* ── RESPONSIVE DESIGN ── */
+@media (max-width: 768px) {
+  .nav { padding: 15px 20px; flex-direction: column; gap: 15px; }
+  .page { padding: 40px 15px; }
+  .insights-grid { grid-template-columns: 1fr; }
+  .stat-pill-row { flex-direction: column; gap: 10px; }
+  .stat-pill { text-align: center; }
+  .chart-container { height: auto; min-height: 250px; }
+}
 </style>
 </head>
 <body>

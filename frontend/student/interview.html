@@ -1002,6 +1002,26 @@
         transform: translateX(-50%) translateY(0);
       }
     }
+
+    /* ── RESPONSIVE DESIGN ── */
+    @media (max-width: 768px) {
+      .topbar { padding: 10px; }
+      .layout { 
+        display: flex; 
+        flex-direction: column; 
+        overflow-y: auto;
+      }
+      .question-panel, .transcript-panel, .controls-panel {
+        height: auto;
+        min-height: 250px;
+        flex: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .divider-col, .divider-row-el { display: none; }
+      .modal { width: 95%; max-width: 400px; padding: 30px; }
+      .timer-pill { font-size: 16px; padding: 6px 16px; }
+      #toast-container { width: 90%; }
+    }
   </style>
 </head>
 

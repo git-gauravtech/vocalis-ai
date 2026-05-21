@@ -25,6 +25,14 @@
 .file-chosen .file-name { font-weight: 500; color: var(--green); flex: 1; }
 .file-chosen button { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 18px; }
 .submit-row { display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; }
+
+/* ── RESPONSIVE DESIGN ── */
+@media (max-width: 600px) {
+  .setup-wrap { padding: 20px 15px; }
+  .setup-card { padding: 20px; }
+  .submit-row { flex-direction: column; }
+  .submit-row button { width: 100%; }
+}
 </style>
 </head>
 <body>

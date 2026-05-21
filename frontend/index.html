@@ -154,6 +154,26 @@ nav.scrolled {
 
 .reveal { opacity: 0; transform: translateY(40px); transition: 1s cubic-bezier(0.2, 0, 0.2, 1); }
 .reveal.is-visible { opacity: 1; transform: none; }
+
+/* ── RESPONSIVE DESIGN ── */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero h1 { font-size: clamp(40px, 12vw, 60px); letter-spacing: -2px; }
+  .hero-p { font-size: 16px; padding: 0 10px; }
+  
+  .preview-inner { grid-template-columns: 1fr !important; min-height: auto !important; }
+  .p-left { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 30px !important; }
+  .p-right { padding: 20px !important; }
+  
+  .feat-grid { grid-template-columns: 1fr; }
+  
+  .step-row { flex-direction: column; text-align: center !important; gap: 20px; margin-bottom: 60px; }
+  .step-num { font-size: 60px; }
+  
+  .contact-card .input-row { grid-template-columns: 1fr !important; }
+  
+  div[style*="justify-content:center; gap:60px;"] { gap: 30px !important; flex-direction: column; }
+}
 </style>
 </head>
 <body>
