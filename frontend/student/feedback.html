@@ -20,7 +20,7 @@
   animation: score-pulse 2s infinite alternate ease-in-out;
 }
 @keyframes score-pulse { from { transform: scale(1); box-shadow: 0 4px 12px rgba(217,108,74,0.05); } to { transform: scale(1.03); box-shadow: 0 12px 32px rgba(217,108,74,0.15); } }
-.score-circle .num { font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.score-circle .num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 800; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 .score-circle .denom { font-size: 14px; color: var(--text3); }
 .header-info { flex: 1; }
 .header-info h1 { font-size: 28px; margin-bottom: 8px; }
@@ -36,7 +36,7 @@
 
 
 .section-heading {
-  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700;
+  font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700;
   margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
 }
 
@@ -58,7 +58,7 @@
   border-radius: var(--radius); padding: 20px; text-align: center;
 }
 .skill-name { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
-.skill-score { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; }
+.skill-score { font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 800; }
 .skill-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
 .skill-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
 
@@ -74,7 +74,7 @@
 .qa-header:hover { background: var(--bg3); }
 .qa-q { font-size: 15px; font-weight: 500; flex: 1; }
 .qa-score-pill {
-  padding: 4px 12px; border-radius: 100px; font-family: 'Syne', sans-serif;
+  padding: 4px 12px; border-radius: 100px; font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 700; font-size: 14px; flex-shrink: 0;
 }
 .qa-body { padding: 0 20px 20px; border-top: 1px solid var(--border); display: none; }
@@ -95,7 +95,7 @@
 .tip-num {
   width: 32px; height: 32px; border-radius: 50%; background: var(--accent-glow);
   border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--accent2); flex-shrink: 0;
+  font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 14px; color: var(--accent2); flex-shrink: 0;
 }
 .tip-area { font-weight: 600; margin-bottom: 4px; font-size: 15px; }
 .tip-text { color: var(--text2); font-size: 14px; margin-bottom: 6px; }
@@ -115,7 +115,7 @@
 </head>
 <body>
 <nav class="nav">
-  <a href="/student/dashboard.html" class="nav-logo">Voca<span>lis</span></a>
+  <a href="/student/dashboard.html" class="nav-logo"><img src="/assets/logo.svg" alt="Logo" width="28" height="28" />Voca<span>lis</span></a>
   <div class="nav-user">
     <img id="nav-avatar" class="nav-avatar" src="" alt="avatar" />
     <span id="nav-name" class="nav-name"></span>
@@ -240,7 +240,7 @@ function renderFeedback(iv, user) {
 
     <div class="readiness-bar-wrap">
       <div class="readiness-label">
-        <span style="font-family:'Syne',sans-serif;font-weight:600;">Interview Readiness</span>
+        <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:600;">Interview Readiness</span>
         <span style="color:${readinessColor};font-weight:700;">${f.interview_readiness}</span>
       </div>
       <div class="progress-bar" style="height:8px"><div class="progress-fill" style="width:${readinessVal}%;background:${readinessColor}"></div></div>

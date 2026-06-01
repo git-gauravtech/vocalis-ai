@@ -4,7 +4,7 @@
 <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Student Directory — Vocalis Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css" />
 <script src="../js/auth.js"></script>
 <style>
@@ -12,17 +12,17 @@
   --text-dim: #5c534c;
 }
 
-body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'Bricolage Grotesque', sans-serif; overflow-x: hidden; }
 
 /* Animations removed */
 
 .nav { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 20px 48px; position: sticky; top: 0; z-index: 100; }
-.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; text-decoration: none; color: var(--text); }
+.nav-logo { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; text-decoration: none; color: var(--text);  display: flex; align-items: center; gap: 8px; }
 .nav-logo span { color: var(--accent); }
 
 .page { max-width: 1000px; margin: 60px auto; padding: 0 24px; }
 .header { margin-bottom: 48px; }
-.header h1 { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -2px; margin-bottom: 8px; }
+.header h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -2px; margin-bottom: 8px; }
 .header p { color: var(--text-dim); font-size: 16px; font-weight: 300; }
 
 .search-container { position: relative; margin-bottom: 32px; }
@@ -43,11 +43,11 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 .student-card:hover { background: var(--surface2); border-color: var(--border2); transform: translateX(5px); }
 
 .student-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--border); }
-.student-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+.student-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 2px; }
 .student-email { font-size: 12px; color: var(--text-dim); }
 
 .stat-box { text-align: center; min-width: 80px; }
-.stat-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; color: var(--accent); }
+.stat-val { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 20px; color: var(--accent); }
 .stat-lab { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
 
 .date-box { font-size: 12px; color: var(--text-dim); font-weight: 300; min-width: 120px; text-align: right; }
@@ -61,7 +61,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 
 
 <nav class="nav">
-  <a href="/admin/dashboard.html" class="nav-logo">Voca<span>lis</span></a>
+  <a href="/admin/dashboard.html" class="nav-logo"><img src="/assets/logo.svg" alt="Logo" width="28" height="28" />Voca<span>lis</span></a>
   <div class="nav-user">
     <img id="nav-avatar" class="nav-avatar" src="" alt="avatar" referrerpolicy="no-referrer" />
     <span id="nav-name" class="nav-name"></span>

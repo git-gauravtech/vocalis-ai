@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
 
 :root {
   --bg: #faf7f2;
@@ -26,14 +26,14 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
 }
 
-h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
+h1, h2, h3, h4 { font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: -0.02em; }
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 6px; }
@@ -43,7 +43,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
 /* ── BUTTONS ── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 24px; border-radius: var(--radius); font-family: 'Syne', sans-serif;
+  padding: 12px 24px; border-radius: var(--radius); font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 14px; font-weight: 600; cursor: pointer; border: none;
   transition: all 0.2s ease; text-decoration: none; letter-spacing: 0.01em;
 }
@@ -86,9 +86,9 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
 }
 @keyframes navSlideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
 .nav-logo {
-  font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+  font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800;
   color: var(--text); text-decoration: none;
-}
+ display: flex; align-items: center; gap: 8px; }
 .nav-logo span { color: var(--accent); }
 .nav-user { display: flex; align-items: center; gap: 12px; }
 .nav-avatar {
@@ -102,7 +102,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
 .form-label { font-size: 13px; font-weight: 500; color: var(--text2); letter-spacing: 0.05em; text-transform: uppercase; }
 .form-input {
   background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius);
-  color: var(--text); padding: 12px 16px; font-family: 'DM Sans', sans-serif;
+  color: var(--text); padding: 12px 16px; font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 15px; transition: border-color 0.2s;
   outline: none; width: 100%;
 }
@@ -139,7 +139,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: linear-gradient(90deg, var(--accent), var(--yellow));
 }
-.stat-value { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--text); }
+.stat-value { font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 800; color: var(--text); }
 .stat-label { font-size: 13px; color: var(--text2); margin-top: 4px; }
 
 /* ── SCORE RING ── */
@@ -148,7 +148,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   border: 4px solid var(--border2); position: relative;
 }
-.score-ring .score-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; }
+.score-ring .score-num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 800; }
 .score-ring .score-of { font-size: 12px; color: var(--text3); }
 
 /* ── TOAST ── */
@@ -182,7 +182,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
 .option-group { display: flex; gap: 10px; flex-wrap: wrap; }
 .option-btn {
   padding: 10px 18px; border-radius: var(--radius); border: 1px solid var(--border2);
-  background: var(--bg3); color: var(--text2); font-family: 'DM Sans', sans-serif;
+  background: var(--bg3); color: var(--text2); font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 14px; cursor: pointer; transition: all 0.2s;
 }
 .option-btn:hover { border-color: var(--accent); color: var(--accent); }
@@ -202,7 +202,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
 /* ── TABLE ── */
 .table { width: 100%; border-collapse: collapse; }
 .table th {
-  text-align: left; font-family: 'Syne', sans-serif; font-size: 12px;
+  text-align: left; font-family: 'Bricolage Grotesque', sans-serif; font-size: 12px;
   text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3);
   padding: 12px 16px; border-bottom: 1px solid var(--border);
 }
@@ -239,7 +239,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; letter-spacing: -0.02em; }
 /* ── VERDICT ── */
 .verdict-badge {
   display: inline-block; padding: 10px 24px; border-radius: 100px;
-  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px;
+  font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 15px;
   letter-spacing: 0.02em; backdrop-filter: blur(8px);
 }
 

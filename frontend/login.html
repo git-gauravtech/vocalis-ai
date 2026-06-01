@@ -4,7 +4,8 @@
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sign In — Vocalis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
 <script src="js/auth.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -16,7 +17,7 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   min-height: 100vh;
   display: flex; flex-direction: column;
   overflow: hidden;
@@ -30,8 +31,9 @@ body {
   padding: 30px 6vw;
 }
 .logo {
-  font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800;
+  font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800;
   text-decoration: none; color: var(--text); letter-spacing: -1px;
+  display: flex; align-items: center; gap: 8px;
 }
 .logo span { color: var(--accent); }
 .back-btn {
@@ -52,7 +54,7 @@ body {
   text-align: center;
 }
 
-.card-logo { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; margin-bottom: 12px; letter-spacing: -1.5px; }
+.card-logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 800; margin-bottom: 12px; letter-spacing: -1.5px; }
 .card-logo span { color: var(--accent); }
 .card-tagline { color: var(--text-dim); font-size: 15px; line-height: 1.6; margin-bottom: 40px; font-weight: 300; }
 
@@ -80,13 +82,13 @@ footer { padding: 40px; display: flex; gap: 30px; justify-content: center; font-
 
 
 <div class="top-bar">
-  <a href="/" class="logo">Voca<span>lis</span></a>
+  <a href="/" class="logo"><img src="/assets/logo.svg" alt="Logo" width="28" height="28" />Voca<span>lis</span></a>
   <a href="/" class="back-btn">← Back to methodology</a>
 </div>
 
 <div class="main">
   <div class="login-card">
-    <div class="card-logo">Voca<span>lis</span></div>
+    <div class="card-logo" style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px;"><img src="/assets/logo.svg" alt="Logo" width="36" height="36" />Voca<span>lis</span></div>
     <p class="card-tagline">Welcome to the future of interview preparation. Sign in to access your dashboard.</p>
     
     <div class="divider-row">

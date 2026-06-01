@@ -4,7 +4,7 @@
 <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dashboard — Vocalis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css" />
 <script src="../js/auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,18 +13,18 @@
   --text-dim: #5c534c;
 }
 
-body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'Bricolage Grotesque', sans-serif; overflow-x: hidden; }
 
 /* Animations removed */
 
 .nav { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 20px 48px; }
-.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; text-decoration: none; color: var(--text); }
+.nav-logo { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; text-decoration: none; color: var(--text);  display: flex; align-items: center; gap: 8px; }
 .nav-logo span { color: var(--accent); }
 
 /* Tabs */
 .tabs { display: flex; gap: 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; margin-top: 20px; }
 .tab { 
-  padding: 16px 0; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; 
+  padding: 16px 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 14px; 
   color: var(--text-dim); cursor: pointer; position: relative; transition: 0.3s;
 }
 .tab:hover { color: var(--text); }
@@ -35,7 +35,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 .view-section.active { display: block; }
 
 .welcome { margin-bottom: 40px; }
-.welcome h1 { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -2px; margin-bottom: 8px; }
+.welcome h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -2px; margin-bottom: 8px; }
 
 .start-card {
   background: var(--surface);
@@ -59,12 +59,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 
 .productivity-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 48px; }
 .prod-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; }
-.prod-header { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-.notepad-area { flex: 1; background: transparent; border: none; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 14px; line-height: 1.6; resize: none; outline: none; width: 100%; min-height: 150px; }
+.prod-header { font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.notepad-area { flex: 1; background: transparent; border: none; color: var(--text); font-family: 'Bricolage Grotesque', sans-serif; font-size: 14px; line-height: 1.6; resize: none; outline: none; width: 100%; min-height: 150px; }
 .notepad-area::placeholder { color: var(--text-dim); }
 .calendar-widget { text-align: center; }
 .cal-month { font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-.cal-day { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--accent2); line-height: 1; margin-bottom: 8px; }
+.cal-day { font-family: 'Bricolage Grotesque', sans-serif; font-size: 64px; font-weight: 800; color: var(--accent2); line-height: 1; margin-bottom: 8px; }
 .cal-weekday { font-size: 16px; font-weight: 500; }
 
 .saved-notes-list { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; max-height: 220px; overflow-y: auto; display: none; }
@@ -101,7 +101,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 
 
 <nav class="nav">
-  <a href="/student/dashboard.html" class="nav-logo">Voca<span>lis</span></a>
+  <a href="/student/dashboard.html" class="nav-logo"><img src="/assets/logo.svg" alt="Logo" width="28" height="28" />Voca<span>lis</span></a>
   <div class="nav-user">
     <img id="nav-avatar" class="nav-avatar" src="" alt="avatar" referrerpolicy="no-referrer" />
     <span id="nav-name" class="nav-name"></span>
@@ -127,7 +127,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
         <h2>Start New Simulation</h2>
         <p>Upload your latest resume and choose a target company to begin an AI-powered technical or behavioral interview.</p>
       </div>
-      <a href="/student/setup.html" class="btn btn-primary" style="padding: 16px 36px; border-radius: 14px; font-weight: 700; font-family: 'Syne';">New Interview</a>
+      <a href="/student/setup.html" class="btn btn-primary" style="padding: 16px 36px; border-radius: 14px; font-weight: 700; font-family: 'Bricolage Grotesque';">New Interview</a>
     </div>
 
     <div id="stats-grid" class="grid-3 reveal" style="margin-bottom:48px;"></div>
@@ -155,7 +155,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
     </div>
 
     <div class="history-toggle-row reveal" onclick="toggleHistoryList()">
-      <div style="font-family: 'Syne'; font-size: 22px; font-weight: 700;">Performance History</div>
+      <div style="font-family: 'Bricolage Grotesque'; font-size: 22px; font-weight: 700;">Performance History</div>
       <div class="history-toggle-btn" id="history-toggle-btn">＋</div>
     </div>
     <div id="history-list" style="display:none;"></div>
@@ -168,11 +168,11 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
     </div>
     <div class="grid-2">
       <div class="chart-card reveal" style="background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 24px;">
-        <h3 style="font-family:'Syne'; font-size:18px; margin-bottom:16px;">Top Strengths</h3>
+        <h3 style="font-family:'Bricolage Grotesque'; font-size:18px; margin-bottom:16px;">Top Strengths</h3>
         <ul id="strengths-list" style="color:var(--text-dim); font-size:14px; line-height:2;"></ul>
       </div>
       <div class="chart-card reveal" style="background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 24px;">
-        <h3 style="font-family:'Syne'; font-size:18px; margin-bottom:16px;">Growth Areas</h3>
+        <h3 style="font-family:'Bricolage Grotesque'; font-size:18px; margin-bottom:16px;">Growth Areas</h3>
         <ul id="weaknesses-list" style="color:var(--text-dim); font-size:14px; line-height:2;"></ul>
       </div>
     </div>
@@ -349,7 +349,7 @@ function renderSessions(interviews) {
   list.innerHTML = interviews.map(iv => {
     const score = iv.feedback?.overall_score;
     const scoreHtml = score
-      ? `<span style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:${scoreColor(score)}">${score}/10</span>`
+      ? `<span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;color:${scoreColor(score)}">${score}/10</span>`
       : `<span style="font-size:12px; color:var(--text-dim); background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:100px;">${iv.status.toUpperCase()}</span>`;
     
     return `
