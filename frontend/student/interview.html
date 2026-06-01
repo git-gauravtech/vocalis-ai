@@ -24,17 +24,17 @@
     }
 
     :root {
-      --bg: #08080f;
-      --panel: #0e0e18;
-      --surface: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.07);
-      --accent: #6c63ff;
-      --accent2: #9d97ff;
-      --red: #ef4444;
-      --green: #22c55e;
-      --text: #f0f0f8;
-      --text2: rgba(255, 255, 255, 0.5);
-      --text3: rgba(255, 255, 255, 0.25);
+      --bg: #faf7f2;
+      --panel: #f3eee6;
+      --surface: #ffffff;
+      --border: #e2dcd2;
+      --accent: #d96c4a;
+      --accent2: #e08b6f;
+      --red: #d9534f;
+      --green: #4f8a65;
+      --text: #2b2622;
+      --text2: #5c534c;
+      --text3: #8a817a;
     }
 
     html,
@@ -58,7 +58,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 20px;
-      background: rgba(8, 8, 15, 0.85);
+      background: rgba(250, 247, 242, 0.9);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
     }
@@ -98,8 +98,8 @@
       font-weight: 700;
       color: var(--accent2);
       letter-spacing: 0.05em;
-      border-color: rgba(108, 99, 255, 0.3);
-      background: rgba(108, 99, 255, 0.08);
+      border-color: rgba(217, 108, 74, 0.3);
+      background: rgba(217, 108, 74, 0.08);
       min-width: 80px;
       justify-content: center;
     }
@@ -131,9 +131,9 @@
     .end-btn {
       padding: 7px 16px;
       border-radius: 8px;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      background: rgba(239, 68, 68, 0.08);
-      color: #ff6b6b;
+      border: 1px solid rgba(217, 83, 79, 0.3);
+      background: rgba(217, 83, 79, 0.08);
+      color: var(--red);
       font-family: 'Syne', sans-serif;
       font-size: 12px;
       font-weight: 600;
@@ -143,8 +143,8 @@
     }
 
     .end-btn:hover {
-      background: rgba(239, 68, 68, 0.18);
-      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(217, 83, 79, 0.18);
+      border-color: rgba(217, 83, 79, 0.5);
     }
 
     /* ══ LAYOUT ══════════════════════════════════════════ */
@@ -240,8 +240,8 @@
       bottom: 12px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(108, 99, 255, 0.15);
-      border: 1px solid rgba(108, 99, 255, 0.3);
+      background: rgba(217, 108, 74, 0.15);
+      border: 1px solid rgba(217, 108, 74, 0.3);
       border-radius: 100px;
       padding: 5px 16px;
       font-size: 11px;
@@ -282,7 +282,7 @@
       width: 400px;
       height: 400px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(108, 99, 255, 0.08) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(217, 108, 74, 0.08) 0%, transparent 70%);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -60%);
@@ -299,7 +299,7 @@
       position: absolute;
       inset: -20px;
       border-radius: 50%;
-      border: 1px solid rgba(108, 99, 255, 0.15);
+      border: 1px solid rgba(217, 108, 74, 0.15);
       animation: ringExpand 3s ease-in-out infinite;
     }
 
@@ -333,8 +333,8 @@
       width: 96px;
       height: 96px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      border: 2px solid rgba(108, 99, 255, 0.3);
+      background: var(--surface);
+      border: 2px solid rgba(217, 108, 74, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -346,7 +346,7 @@
 
     .ai-avatar.speaking {
       border-color: var(--accent);
-      box-shadow: 0 0 30px rgba(108, 99, 255, 0.4), 0 0 60px rgba(108, 99, 255, 0.15);
+      box-shadow: 0 0 30px rgba(217, 108, 74, 0.4), 0 0 60px rgba(217, 108, 74, 0.15);
       animation: avatarPulse 0.6s ease-in-out infinite alternate;
     }
 
@@ -407,8 +407,8 @@
     .question-bubble {
       max-width: 580px;
       width: 100%;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 20px 20px 20px 4px;
       padding: 24px 28px;
       position: relative;
@@ -421,7 +421,7 @@
       left: 24px;
       right: 24px;
       height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(108, 99, 255, 0.6), transparent);
+      background: linear-gradient(90deg, transparent, rgba(217, 108, 74, 0.6), transparent);
       border-radius: 0 0 2px 2px;
     }
 
@@ -508,7 +508,7 @@
     .cam-panel {
       grid-column: 3;
       grid-row: 1;
-      background: #050508;
+      background: var(--panel);
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -522,9 +522,9 @@
       flex: 1;
       border-radius: 14px;
       overflow: hidden;
-      background: #0d0d18;
+      background: var(--bg);
       position: relative;
-      border: 1.5px solid rgba(255, 255, 255, 0.06);
+      border: 1.5px solid var(--border);
       min-height: 0;
     }
 
@@ -573,9 +573,8 @@
     }
 
     .cam-pill-btn {
-      background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 8px;
       color: rgba(255, 255, 255, 0.7);
       font-size: 13px;
@@ -633,8 +632,8 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      background: var(--surface);
+      border: 1.5px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -670,7 +669,7 @@
       grid-row: 3;
       border-top: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      background: rgba(8, 8, 15, 0.9);
+      background: var(--panel);
       display: flex;
       flex-direction: column;
       padding: 14px 20px;
@@ -716,7 +715,7 @@
       grid-row: 3;
       border-top: 1px solid var(--border);
       border-left: 1px solid var(--border);
-      background: rgba(8, 8, 15, 0.9);
+      background: var(--panel);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -760,7 +759,7 @@
     }
 
     .btn-mic {
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--surface);
       color: var(--text);
     }
 
@@ -786,7 +785,7 @@
     }
 
     .btn-cam {
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--surface);
       color: var(--text);
     }
 

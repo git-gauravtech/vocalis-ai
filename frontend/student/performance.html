@@ -10,25 +10,15 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root {
-  --bg: #030305;
-  --surface: rgba(255, 255, 255, 0.03);
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #6366f1;
-  --text: #ffffff;
-  --text-dim: rgba(255, 255, 255, 0.6);
+  --text-dim: #5c534c;
 }
 
 body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; }
 
-.bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-.mesh-orb { position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.15; animation: float 25s infinite alternate ease-in-out; }
-.orb-1 { width: 60vw; height: 60vw; background: #312e81; top: -10%; left: -10%; }
-.orb-2 { width: 50vw; height: 50vw; background: #1e1b4b; bottom: -10%; right: -10%; }
+/* Animations removed */
 
-@keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
-
-.nav { background: rgba(3, 3, 5, 0.8); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); padding: 20px 48px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; text-decoration: none; color: #fff; }
+.nav { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 20px 48px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; text-decoration: none; color: var(--text); }
 .nav-logo span { color: var(--accent); }
 
 .page { max-width: 1100px; margin: 60px auto; padding: 0 24px; }
@@ -36,22 +26,22 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 .header h1 { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; letter-spacing: -3px; margin-bottom: 12px; }
 .header p { color: var(--text-dim); font-size: 18px; font-weight: 300; }
 
-.chart-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 40px; padding: 48px; margin-bottom: 40px; }
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 40px; padding: 48px; margin-bottom: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
 .chart-container { height: 400px; position: relative; }
 
 .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-.insight-box { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 32px; padding: 40px; }
+.insight-box { background: var(--surface); border: 1px solid var(--border); border-radius: 32px; padding: 40px; }
 .insight-box h3 { font-family: 'Syne', sans-serif; font-size: 22px; margin-bottom: 24px; }
 .insight-list { list-style: none; }
 .insight-list li { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); display: flex; align-items: flex-start; gap: 12px; }
 .insight-list li::before { content: '→'; color: var(--accent); font-weight: bold; }
 
 .stat-pill-row { display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; }
-.stat-pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 500; }
+.stat-pill { background: var(--surface2); border: 1px solid var(--border); padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 500; }
 .stat-pill span { color: var(--accent); font-weight: 700; margin-right: 6px; }
 
 .back-link { display: inline-block; margin-top: 60px; color: var(--text-dim); text-decoration: none; font-size: 14px; transition: 0.3s; }
-.back-link:hover { color: #fff; transform: translateX(-5px); }
+.back-link:hover { color: var(--text); transform: translateX(-5px); }
 
 .reveal { animation: fadeInUp 0.8s ease both; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
@@ -69,10 +59,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 </head>
 <body>
 
-<div class="bg-mesh">
-  <div class="mesh-orb orb-1"></div>
-  <div class="mesh-orb orb-2"></div>
-</div>
+
 
 <nav class="nav">
   <a href="/student/dashboard.html" class="nav-logo">Voca<span>lis</span></a>
@@ -156,13 +143,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       datasets: [{
         label: 'Rating',
         data: scores,
-        borderColor: '#6366f1',
+        borderColor: '#d96c4a',
         borderWidth: 4,
-        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+        backgroundColor: 'rgba(217, 108, 74, 0.1)',
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#fff',
-        pointBorderColor: '#6366f1',
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: '#d96c4a',
         pointBorderWidth: 3,
         pointRadius: 6,
         pointHoverRadius: 8
@@ -172,8 +159,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        y: { beginAtZero: true, max: 10, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 12 } } },
-        x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 12 } } }
+        y: { beginAtZero: true, max: 10, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: 'var(--text-dim)', font: { size: 12 } } },
+        x: { grid: { display: false }, ticks: { color: 'var(--text-dim)', font: { size: 12 } } }
       },
       plugins: {
         legend: { display: false },

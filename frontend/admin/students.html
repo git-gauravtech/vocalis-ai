@@ -9,33 +9,15 @@
 <script src="../js/auth.js"></script>
 <style>
 :root {
-  --bg: #030305;
-  --surface: rgba(255, 255, 255, 0.03);
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.15);
-  --text: #ffffff;
-  --text-dim: rgba(255, 255, 255, 0.6);
+  --text-dim: #5c534c;
 }
 
 body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; }
 
-/* ── BACKGROUND MESH ── */
-.bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-.mesh-orb {
-  position: absolute; border-radius: 50%; filter: blur(140px);
-  animation: float 25s infinite alternate ease-in-out; opacity: 0.15;
-}
-.orb-1 { width: 60vw; height: 60vw; background: #312e81; top: -10%; left: -10%; }
-.orb-2 { width: 50vw; height: 50vw; background: #1e1b4b; bottom: -10%; right: -10%; }
+/* Animations removed */
 
-@keyframes float {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(50px, 30px) scale(1.1); }
-}
-
-.nav { background: rgba(3, 3, 5, 0.8); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); padding: 20px 48px; position: sticky; top: 0; z-index: 100; }
-.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; text-decoration: none; color: #fff; }
+.nav { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 20px 48px; position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -1px; text-decoration: none; color: var(--text); }
 .nav-logo span { color: var(--accent); }
 
 .page { max-width: 1000px; margin: 60px auto; padding: 0 24px; }
@@ -45,19 +27,20 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 
 .search-container { position: relative; margin-bottom: 32px; }
 .search-bar {
-  width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-  border-radius: 18px; padding: 18px 24px; color: #fff; font-family: inherit;
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 18px 24px; color: var(--text); font-family: inherit;
   font-size: 15px; transition: all 0.3s;
 }
-.search-bar:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.05); box-shadow: 0 0 20px var(--accent-glow); }
+.search-bar:focus { outline: none; border-color: var(--accent); background: var(--surface2); }
 
 .student-card {
   display: grid; grid-template-columns: auto 1fr auto auto;
   align-items: center; gap: 24px; padding: 20px 32px;
-  background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border);
   border-radius: 24px; margin-bottom: 12px; transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
 }
-.student-card:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--accent); transform: translateX(5px); }
+.student-card:hover { background: var(--surface2); border-color: var(--border2); transform: translateX(5px); }
 
 .student-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--border); }
 .student-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 2px; }
@@ -75,10 +58,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 </head>
 <body>
 
-<div class="bg-mesh">
-  <div class="mesh-orb orb-1"></div>
-  <div class="mesh-orb orb-2"></div>
-</div>
+
 
 <nav class="nav">
   <a href="/admin/dashboard.html" class="nav-logo">Voca<span>lis</span></a>
