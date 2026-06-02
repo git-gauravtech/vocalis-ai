@@ -347,6 +347,7 @@ if os.path.exists(frontend_path):
     app.mount("/js", StaticFiles(directory=os.path.join(frontend_path, "js")), name="js")
     app.mount("/student", StaticFiles(directory=os.path.join(frontend_path, "student")), name="student")
     app.mount("/admin", StaticFiles(directory=os.path.join(frontend_path, "admin")), name="admin")
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_path, "assets")), name="assets")
 
     @app.get("/")
     async def serve_index():
