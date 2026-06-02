@@ -2,7 +2,7 @@
 
 Vocalis is a high-performance product designed to transform how students and professionals prepare for the hiring bar. It’s not just a mock interview tool; it’s an interactive, AI-driven ecosystem that simulates the pressure and depth of elite-tier job interviews.
 
-Live link : https://vocalis-ai-omyf.onrender.com/
+Live Demo : [https://vocalis-ai-indol.vercel.app]
 ---
 
 ## ✨ Signature Features
