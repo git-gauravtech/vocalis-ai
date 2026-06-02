@@ -1285,7 +1285,11 @@
 
       // Initialize WebSocket connection
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/interview/${interviewId}?token=${getToken()}`;
+      let wsHost = window.location.host;
+      if (typeof API !== 'undefined' && API) {
+        wsHost = API.replace('http://', '').replace('https://', '');
+      }
+      const wsUrl = `${protocol}//${wsHost}/ws/interview/${interviewId}?token=${getToken()}`;
       socket = new WebSocket(wsUrl);
 
       socket.onmessage = (event) => {

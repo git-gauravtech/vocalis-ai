@@ -1,6 +1,8 @@
+const RENDER_BACKEND_URL = "https://vocalis-ai-backend.onrender.com"; // CHANGE THIS to your actual Render backend URL
+
 const API = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") 
   ? "http://localhost:8000" 
-  : "";
+  : (window.location.hostname.includes("vercel.app") ? RENDER_BACKEND_URL : "");
 
 // ── TOKEN MANAGEMENT ──────────────────────────────────
 function setToken(token) { localStorage.setItem("mm_token", token); }

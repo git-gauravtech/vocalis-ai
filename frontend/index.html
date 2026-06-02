@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
+  <script src="js/auth.js"></script>
   <style>
     :root {
       --text-dim: #5c534c;
@@ -619,7 +620,7 @@
       if (!name || !email || !message) return alert('Please fill all fields');
       contactBtn.disabled = true; contactBtn.textContent = 'Sending...';
       try {
-        const res = await fetch('/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, message }) });
+        const res = await fetch(API + '/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, message }) });
         if (res.ok) {
           contactStatus.style.display = 'block'; contactStatus.style.color = '#22c55e'; contactStatus.textContent = '✓ Message sent successfully!';
           document.getElementById('contact-name').value = ''; document.getElementById('contact-email').value = ''; document.getElementById('contact-msg').value = '';
